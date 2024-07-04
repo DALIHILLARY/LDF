@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('vets', function (Blueprint $table) {
             $table->id();
+            $table->unsignedInteger('user_id');
             $table->string('profile_picture')->nullable();
             $table->string('title');
             $table->string('category')->nullable()->comment('Paravet or Vet');
@@ -20,7 +21,7 @@ return new class extends Migration
             $table->string('given_name');
             $table->string('nin')->nullable();
             $table->string('coordinates')->nullable();
-            $table->foreignId('location_id')->nullable()->constrained('locations')->onDelete('set null');
+            $table->string('location')->nullable();
             $table->string('village')->nullable();
             $table->string('parish')->nullable();
             $table->string('zone')->nullable();
@@ -38,7 +39,13 @@ return new class extends Migration
             $table->string('certificate_of_registration')->nullable();
             $table->string('license')->nullable();
             $table->json('other_documents')->nullable();
+            $table->string('status')->default('pending');
+            $table->unsignedInteger('added_by');
             $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('user_id')->references('id')->on('admin_users')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('added_by')->references('id')->on('admin_users');
         });
     }
 

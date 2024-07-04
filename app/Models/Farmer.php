@@ -35,76 +35,77 @@ class Farmer extends Model
         'admin_remarks',
         'status',
         'user_id',
+        'added_by',
         
 
     ];
-
-    protected $guarded = [];
-
-    public function applicant()
-    {
-        return $this->belongsTo(User::class, 'applicatant_id'); //TODO("applicant_id instead of applicatant_id")
-    }
-
-    public function location()
-    {
-        return $this->belongsTo(Location::class, 'location_id');
-    }
-
-    public function farms()
-    {
-        return $this->hasMany(Farm::class);
-    }
-
-    public function statuses()
-    {
-        return $this->morphMany(Status::class, 'statusable');
-    }
-
-    public function latestStatus()
-    {
-        return $this->morphOne(Status::class, 'statusable')->latestOfMany();
-    }
-
-    public function profilePhoto()
-    {
-        return $this->morphOne(Media::class, 'mediaable');
-    }
-
-    public function inspectingAgent()
-    {
-        return $this->belongsTo(User::class, 'agent_id');
-    }
 
     protected static function boot()
     {
         parent::boot();
 
         static::creating(function ($model) {
+            
+                //check if the user with the same primary_phone_number exists
+                $user = User::where('email', $model->primary_phone_number) 
+                ->orWhere('username', $model->primary_phone_number)
+                ->first();
+                if(!$user){
+                   //create a new user and assign the user_id to the vet
+                    $new_user = new User();
+                    $new_user->username = $model->primary_phone_number;
+                    $new_user->name = $model->surname.' '.$model->given_name;
+                    $new_user->email = $model->primary_phone_number;
+                    $new_user->password = bcrypt('password');
+                    $new_user->avatar = $model->profile_picture ? $model->profile_picture : 'images/default_image.png';
+                    $new_user->save();
+
+                    
+                    $model->user_id = $new_user->id;
+                }
+               
+          
            
         });
 
           //call back to send a notification to the user
           self::created(function ($model) 
           {
-              Notification::send_notification($model, 'Farmer', request()->segment(count(request()->segments())));
+               
+
+                Notification::send_notification($model, 'Farmer', request()->segment(count(request()->segments())));
+
+                $new_user = User::where('email', $model->primary_phone_number)
+                ->orWhere('username', $model->primary_phone_number)
+                ->first();
+                $new_role = new AdminRoleUser();
+                $new_role->role_id = 3;
+                $new_role->user_id = $new_user->id;
+                $new_role->save();
+                
+
           });
+
+
+           //callback to create a user with the vet credentials after if the status is approved 
+           self::updating(function ($model){
+               
+            });
+           
 
             //call back to send a notification to the user
             self::updated(function ($model) 
             {
                 Notification::update_notification($model, 'Farmer', request()->segment(count(request()->segments())-1));
+
                 
-                if($model->status == 'approved'){
-                    AdminRoleUser::where([
-                        'user_id' => $model->user_id
-                    ])->delete();
-                    $new_role = new AdminRoleUser();
-                    $new_role->user_id = $model->user_id;
-                    $new_role->role_id = 3;
-                    $new_role->save();
-                }
+ 
             });
+
+    
+         
+        
 
     }
 }
+ 

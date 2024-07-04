@@ -25,13 +25,20 @@ return new class extends Migration
             $table->string('postal_address')->nullable();
             $table->json('other_services')->nullable();
             $table->string('logo')->nullable();
-            $table->string('distroict_of_operation')->nullable();
+            $table->string('district_of_operation')->nullable();
             $table->string('NDA_registration_number')->nullable();
             $table->string('tin_number_business')->nullable();
             $table->string('tin_number_owner')->nullable();
             $table->string('license')->nullable();
+            $table->string('status')->default('pending');
             $table->json('other_documents')->nullable();
+            $table->unsignedInteger('user_id');
+            $table->unsignedInteger('added_by');
+            $table->softDeletes();
             $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('admin_users')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('added_by')->references('id')->on('admin_users');
         });
     }
 

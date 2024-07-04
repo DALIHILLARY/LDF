@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('cooperatives', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->foreignId('location_id')->nullable()->constrained('locations')->onDelete('set null');
+            // $table->foreignId('location_id')->nullable()->constrained('locations')->onDelete('set null');
+            $table->string('location')->nullable();
             $table->string('village')->nullable();
             $table->string('parish')->nullable();
             $table->string('zone')->nullable();
@@ -23,6 +24,7 @@ return new class extends Migration
             $table->string('certification')->nullable();
             $table->longText('description')->nullable();
             $table->unsignedInteger('applicant_id')->nullable();
+            $table->string('status')->default('pending');
             $table->foreign('applicant_id')->references('id')->on('admin_users');
             $table->timestamps();
         });

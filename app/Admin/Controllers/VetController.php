@@ -32,7 +32,7 @@ class VetController extends AdminController
 
         $grid->filter(function ($f) {
             $f->disableIdFilter();
-            $f->select('location_id', 'SubCounty')->options(\App\Models\Location::where('parent','!=',0)->pluck('name', 'id'));
+            $f->select('location', 'SubCounty');
             $f->like('category', 'Category');
             $f->like('group_or_practice', 'Group or practice');
             $f->between('created_at', 'Filter by date registered')->date();
@@ -51,11 +51,6 @@ class VetController extends AdminController
          //disable action buttons appropriately
          Utils::disable_buttons('Vet', $grid);
 
-         //If the user is a vet, disable the create button
-        if (Admin::user()->inRoles(['vet'])) {
-            $grid->disableCreateButton();
-        }
-
         $grid->export(function ($export) {
         
             $export->originalValue(['status',]);
@@ -71,7 +66,6 @@ class VetController extends AdminController
         return $c->format('d M, Y');
         });
      
-        $grid->column('profile_picture', __('Profile picture'))->image( '', 50, 50);
         $grid->column('title', __('Title'));
         $grid->column('category', __('Category'));
         $grid->column('surname', __('Surname'));
@@ -106,62 +100,9 @@ class VetController extends AdminController
         //delete notification after viewing the form
         Utils::delete_notification('Vet', $id);
 
-        $show->field('profile_picture', __('Profile picture'))->image();
-        $show->field('title', __('Title'));
-        $show->field('category', __('Category'));
-        $show->field('surname', __('Surname'));
-        $show->field('given_name', __('Given name'));
-        $show->field('nin', __('Nin'));
-        $show->field('location_id', __('District SubCounty'))->as(function ($x) {
-            return \App\Models\Location::where('id', $x)->pluck('name')->first();
-        });
-        $show->field('village', __('Village'));
-        $show->field('parish', __('Parish'));
-        $show->field('zone', __('Zone'));
-        $show->field('group_or_practice', __('Group or practice'));
-        $show->field('license_number', __('License number'));
-        $show->field('license_expiry_date', __('License expiry date'));
-        $show->field('date_of_registration', __('Date of registration'));
-        $show->field('brief_profile', __('Brief profile'));
-        $show->field('primary_phone_number', __('Primary phone number'));
-        $show->field('secondary_phone_number', __('Alternative phone number'));
-        $show->field('email', __('Email'));
-        $show->field('postal_address', __('Postal address'));
-        $show->field('services_offered', __('Services offered'));
-        $show->field('ares_of_operation', __('Areas of operation'));
-        $show->field('certificate_of_registration', __('Certificate of registration'))->file();
-        $show->field('license', __('License'))->file();
-        $show->field('other_documents', __('Other documents'))->as(function ($x) {
-            $files = '';
+        $vet = Vet::findorFail($id);
+        return view('vets_profile', compact('vet'));
 
-            //check if $x is null
-            if ($x == null) {
-                return 'No documents uploaded';
-            }
-            // Decode the JSON string into an array
-            $xArray = json_decode($x, true);
-            
-            // Check if decoding was successful and $xArray is an array
-            if (is_array($xArray)) {
-                foreach ($xArray as $key => $value) {
-                    $files .= "<a href='/storage/$value' target='_blank'>Document ".($key+1)."</a><br>";
-                }
-            } else {
-                // Handle the case where decoding failed or $xArray is not an array
-                $files = 'Invalid data for $x';
-            }
-            
-            return $files ;
-        })->unescape();
-        $show->field('created_at', __('Created at'));
-        $show->field('updated_at', __('Updated at'));
-
-        //disable tools
-        $show->panel()->tools(function ($tools) {
-            $tools->disableEdit();
-            $tools->disableDelete();
-        });
-        return $show;
     }
 
     /**
@@ -175,18 +116,25 @@ class VetController extends AdminController
 
         if($form->isCreating()){
             $form->hidden('status')->default('Pending');
-            $form->hidden('user_id')->default(Admin::user()->id);
+            $form->hidden('added_by')->default(Admin::user()->id);
         }
 
-        $form->file('profile_picture', __('Profile picture'));
-        $form->text('title', __('Title'))->rules('required');
+        $form->select('title', __('Title'))
+        ->options([
+            'Mr' => 'Mr',
+            'Mrs' => 'Mrs',
+            'Miss' => 'Miss',
+            'Dr' => 'Dr',
+            'Prof' => 'Prof',
+        ])
+        ->rules('required');
         $form->radio('category', __('Category'))->options(['Vet' => 'Vet', 'Paravet' => 'Paravet'])->rules('required')->default('Vet');
         $form->text('surname', __('Surname'))->rules('required');
         $form->text('given_name', __('Given name'))->rules('required');
         $form->text('nin', __('Nin'))->rules('required');
        
         $form->text('coordinates', __('Physical Address '))->required();
-        $form->select('location_id', __('District SubCounty'))->options(\App\Models\Location::where('parent','!=',0)->pluck('name', 'id'))->rules('required');
+        $form->text('location', __('District SubCounty'));
         $form->text('village', __('Village'));
         $form->text('parish', __('Parish'));
         $form->text('zone', __('Zone'));
@@ -197,13 +145,15 @@ class VetController extends AdminController
         $form->textarea('brief_profile', __('Brief profile'));
         $form->text('primary_phone_number', __('Primary phone number'))->rules('required');
         $form->text('secondary_phone_number', __('Alternative phone number'));
-        $form->email('email', __('Email'))->rules('required');
+        $form->email('email', __('Email'))->rules('unique:vets,email')->rules('required');
         $form->text('postal_address', __('Postal address'));
         $form->textarea('services_offered', __('Services offered'))->rules('required');
         $form->text('ares_of_operation', __('Areas of operation'))->rules('required');
         $form->file('certificate_of_registration', __('Certificate of registration'))->rules('required');
         $form->file('license', __('License'))->rules('required');
         $form->multipleFile('other_documents', __('Other documents'));
+        $form->file('profile_picture', __('Profile picture'));
+        $form->hidden('user_id');
 
         //check if the user is an admin and show the status field
         if (Admin::user()->inRoles(['administrator','ldf_admin'])) {

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('given_name');
             $table->date('date_of_birth')->nullable();
             $table->string('nin')->nullable();
-            $table->foreignId('location_id')->nullable()->constrained('locations')->onDelete('set null');
+            $table->string('location')->nullable();
             $table->string('village')->nullable();
             $table->string('parish')->nullable();
             $table->string('zone')->nullable();
@@ -35,15 +35,14 @@ return new class extends Migration
             $table->string('credit_institution')->nullable();
             $table->string('date_started_farming')->nullable();
             $table->string('highest_level_of_education')->nullable();
-            $table->unsignedInteger('applicatant_id')->nullable();
-            $table->boolean('is_verified')->default(false);
-            $table->text('agent_remarks')->nullable();
-            $table->unsignedInteger('agent_id')->nullable();
-            $table->foreign('agent_id')->references('id')->on('admin_users');
-            $table->text('admin_remarks')->nullable();
-            $table->unsignedInteger('admin_id')->nullable();
-            $table->foreign('admin_id')->references('id')->on('admin_users');
+            $table->unsignedInteger('added_by');
+            $table->unsignedInteger('user_id');
+            $table->string('status')->nullable();
             $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('user_id')->references('id')->on('admin_users')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('added_by')->references('id')->on('admin_users');
         });
     }
 

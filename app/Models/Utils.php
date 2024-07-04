@@ -59,16 +59,16 @@ class Utils extends Model
         if ($user->inRoles(['administrator','ldf_admin'])) 
         {
                 //disable create button and delete
-                $grid->disableCreateButton();
                 $grid->actions(function ($actions) {
                     
                 if ($actions->row->status == 'approved') {
                     $actions->disableDelete();
                     $actions->disableEdit();
-                }else{
-                    
-                    $actions->disableDelete();
                 }
+                // }else{
+                    
+                //     $actions->disableDelete();
+                // }
                 });
         }
 

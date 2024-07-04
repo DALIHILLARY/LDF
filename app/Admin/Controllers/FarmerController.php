@@ -41,7 +41,7 @@ class FarmerController extends AdminController
                     ->orWhere('primary_phone_number', 'like', "%{$this->input}%")
                     ->orWhere('secondary_phone_number', 'like', "%{$this->input}%");
             }, 'Search by name, nin, phone number');
-            $f->equal('is_verified', 'Is verified')->select([0 => 'No', 1 => 'Yes']);
+            
 
         });
 
@@ -58,10 +58,17 @@ class FarmerController extends AdminController
          //disable action buttons appropriately
          Utils::disable_buttons('Vet', $grid);
 
-        $grid->column('profile_picture', __('Profile picture'))->image();
+         $grid->column('profile_picture', __('Profile picture'))->display(function ($profile_picture) {
+            if ($profile_picture) {
+                return $profile_picture;
+            } else {
+                return "/images/default_image.png";
+            }
+        })->image('', 50, 50);
+        
         $grid->column('surname', __('Surname'));
         $grid->column('given_name', __('Given name'));
-        $grid->location()->name('SubCounty');
+        $grid->column('location', __('Location'));
         $grid->column('marital_status', __('Marital status'))->display(function ($marital_status) {
             switch ($marital_status) {
                 case 'S':
@@ -99,89 +106,8 @@ class FarmerController extends AdminController
          //delete notification after viewing the form
          Utils::delete_notification('Farmer', $id);
 
-      
-        $show->field('profile_picture', __('Profile picture'));
-        $show->field('surname', __('Surname'));
-        $show->field('given_name', __('Given name'));
-        $show->field('date_of_birth', __('Date of birth'));
-        $show->field('nin', __('Nin'));
-        $show->field('location_id', __('SubCounty'));
-        $show->field('village', __('Village'));
-        $show->field('parish', __('Parish'));
-        $show->field('zone', __('Zone'));
-        $show->field('gender', __('Gender'))->as(function($gender){
-            switch ($gender) {
-                case 'F':
-                    return 'Female';
-                    break;
-                case 'M':
-                    return 'Male';
-                    break;
-                }
-
-        });
-        $show->field('marital_status', __('Marital status'))->as(function ($marital_status) {
-            switch ($marital_status) {
-                case 'S':
-                    return 'Single';
-                    break;
-                case 'M':
-                    return 'Married';
-                    break;
-                case 'D':
-                    return 'Divorced';
-                    break;
-                case 'W':
-                    return 'Widowed';
-                    break;
-                default:
-                    return 'Unknown';
-                    break;
-            }
-        });
-        $show->field('number_of_dependants', __('Number of dependants'));
-        $show->field('farmer_group', __('Farmer group'));
-        $show->field('primary_phone_number', __('Primary phone number'));
-        $show->field('secondary_phone_number', __('Alternative phone number'));
-        $show->field('is_land_owner', __('Is land owner'))->as(function ($is_land_owner) {
-            switch ($is_land_owner) {
-                case 1:
-                    return 'Yes';
-                    break;
-                case 0:
-                    return 'No';
-                    break;
-                default:
-                    return 'Unknown';
-                    break;
-            }
-        });
-        $show->field('production_scale', __('Production type'));
-        $show->field('access_to_credit', __('Access to credit'))->as(function ($access_to_credit) {
-            switch ($access_to_credit) {
-                case 1:
-                    return 'Yes';
-                    break;
-                case 0:
-                    return 'No';
-                    break;
-                default:
-                    return 'Unknown';
-                    break;
-            }
-        });
-        $show->field('date_started_farming', __('Date started farming'));
-        $show->field('highest_level_of_education', __('Highest level of education'));
-        $show->field('created_at', __('Created at'));
-        $show->field('updated_at', __('Updated at'));
-
-        //disable tools
-        $show->panel()->tools(function ($tools) {
-            $tools->disableEdit();
-            $tools->disableDelete();
-        });
-
-        return $show;
+         $farmer = Farmer::findorFail($id);
+         return view('farmers_profile', compact('farmer'));
     }
 
     /**
@@ -194,7 +120,7 @@ class FarmerController extends AdminController
         $form = new Form(new Farmer());
         if($form->isCreating()){
             $form->hidden('status')->default('Pending');
-            $form->hidden('user_id')->default(Admin::user()->id);
+           
         }
         $form->tools(function (Form\Tools $tools) {
             $tools->disableDelete();
@@ -202,12 +128,11 @@ class FarmerController extends AdminController
            
         });
 
-        $form->image('profile_picture', __('Profile picture'));
         $form->text('surname', __('Surname'))->rules('required');
         $form->text('given_name', __('Given name'))->rules('required');
         $form->date('date_of_birth', __('Date of birth'))->rules('required|before:today');
         $form->text('nin', __('Nin'))->rules('required');
-        $form->select('location_id', __('SubCounty'))->options(\App\Models\Location::where('parent','!=',0)->pluck('name', 'id'))->rules('required');
+        $form->text('location', __('SubCounty'));
         $form->text('village', __('Village'))->rules('required');
         $form->text('parish', __('Parish'))->rules('required');
         $form->text('zone', __('Zone'))->rules('required');
@@ -218,7 +143,7 @@ class FarmerController extends AdminController
         $form->text('primary_phone_number', __('Phone number'))->rules('required');
         $form->text('secondary_phone_number', __('Other phone number'));
         $form->radio('is_land_owner', __('Do you own land ?'))->options([1=> 'Yes', 0 => 'No'])
-            ->when(0, function (Form $form) {
+            ->when(1, function (Form $form) {
                 $form->select('land_ownership', __('Land ownership'))->options([
                     'Lease' => 'Lease',
                     'Rent' => 'Rent',
@@ -250,12 +175,10 @@ class FarmerController extends AdminController
                 'Masters' => 'Masters',
                 'PhD' => 'PhD',
             ])->rules('required');
-
-             //check if the user is an admin and show the status field
-         if (Admin::user()->inRoles(['administrator','ldf_admin'])) {
-            $form->radioCard('status', __('Status'))->options(['halted' => 'Halted', 'approved' => 'Approved', 'rejected' => 'Rejected'])->rules('required');
-        }
-
+            
+        $form->image('profile_picture', __('Profile picture'));
+        $form->hidden('added_by')->default(Admin::user()->id);
+        $form->hidden('user_id');
       
         return $form;
     }

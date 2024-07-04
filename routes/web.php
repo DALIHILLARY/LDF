@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FarmActivityController;
 use App\Admin\Controllers\HomeController;
+use App\Http\Controllers\VetController;
 use Illuminate\Support\Facades\DB;
 use App\Models\FarmActivity;
 use Encore\Admin\Facades\Admin;
@@ -30,27 +31,7 @@ Route::get('/calendar', [FarmActivityController::class, 'index'])->name('event.i
 Route::get('/user-activity', [HomeController::class, 'index'])->name('user-activity');
 Route::get('/financial-summary-data', [HomeController::class, 'index'])->name('financial-summary-data');
 // routes/web.php
-
-Route::get('/calendar-events', function () {
-   
-    try {
-         // Fetch activities from the database
-    $activities = FarmActivity::where('user_id', Admin::user()->id)->get();
-    
-
-    // Transform activities into the required format for FullCalendar
-    $events = [];
-    foreach ($activities as $activity) {
-        $events[] = [
-            'title' => $activity->name,
-            'start' => $activity->scheduled_at, 
-        ];
-    }
-    return response()->json($events);
-    } catch (\Exception $e) {
-        return ('Error fetching calendar events: ' . $e->getMessage());
-        
-    }
-});
+Route::get('download/certificate/{id}', [VetController::class, 'downloadCertificate'])->name('download.certificate');
+Route::get('download/license/{id}', [VetController::class, 'downloadLicense'])->name('download.license');
 
 
