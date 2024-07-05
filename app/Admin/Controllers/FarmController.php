@@ -30,8 +30,8 @@ class FarmController extends AdminController
 
         $grid->filter(function ($f) {
             $f->disableIdFilter();
-            $f->like('name', 'Name');
-            $f->like('location_id', 'SubCounty');
+            $f->like('name', 'Farm name');
+            $f->like('location', 'SubCounty');
             $f->like('production_type', 'Farm type');
             $f->between('created_at', 'Filter by date registered')->date();
         });
@@ -51,23 +51,10 @@ class FarmController extends AdminController
         });
 
         $grid->column('name', __('Name'));
-        $grid->location()->name('SubCounty');
+        $grid->column('location', __('SubCounty'));
         $grid->column('production_type', __('Farm type'));
         $grid->column('date_of_establishment', __('Date of establishment'));
-        $grid->column('breeds', __('Breeds'))
-        ->display(
-            function ($x) {
-                //breeds in badges
-                if ($this->breeds()->count() > 0) {
-                    $breeds = $this->breeds->map(function ($item) {
-                        return  $item->name;
-                    })->toArray();
-                    return join(', ', $breeds);
-                } else {
-                    return '-';
-                }
-            }
-        );
+        $grid->column('breeds', __('Breeds'));
         
 
         return $grid;
@@ -83,28 +70,27 @@ class FarmController extends AdminController
     {
         $show = new Show(Farm::findOrFail($id));
 
-        $show->field('profile_picture', __('Farm image'))->as(function ($profile_picture) {
-            if ($profile_picture == null) {
-                return 'No image';
-            }
-            return "<img src='/storage/$profile_picture' width='800px' height='400px' />";
-        })->unescape();
-        $show->field('name', __('Name'));
-        $show->field('location_id', __('SubCounty'))->as(function ($location_id) {
-            return \App\Models\Location::find($location_id)->name;
-        });
-        $show->field('village', __('Village'));
-        $show->field('parish', __('Parish'));
-        $show->field('zone', __('Zone'));
-        $show->field('production_type', __('Farm type'));
-        $show->field('date_of_establishment', __('Date of establishment'));
-        $show->field('size', __('Land size'));
-       
-        $show->field('number_of_workers', __('Number of workers'));
-        $show->field('land_ownership', __('Land ownership'));
-        $show->field('general_remarks', __('General remarks'));
-        $show->field('created_at', __('Created at'));
-        $show->field('updated_at', __('Updated at'));
+        
+        $farm = Farm::findorFail($id);
+        return view('farms_profile', compact('farm'));
+
+        // $show->field('profile_picture', __('Farm image'))->as(function ($profile_picture) {
+        //     if ($profile_picture == null) {
+        //         return 'No image';
+        //     }
+        //     return "<img src='/storage/$profile_picture' width='800px' height='400px' />";
+        // })->unescape();
+        // $show->field('name', __('Name'));
+        // $show->field('location', __('SubCounty'));
+        // $show->field('village', __('Village'));
+        // $show->field('parish', __('Parish'));
+        // $show->field('zone', __('Zone'));
+        // $show->field('production_type', __('Farm type'));
+        // $show->field('date_of_establishment', __('Date of establishment'));
+        // $show->field('size', __('Land size'));
+        // $show->field('number_of_workers', __('Number of workers'));
+        // $show->field('land_ownership', __('Land ownership'));
+    
 
         return $show;
     }
@@ -118,8 +104,13 @@ class FarmController extends AdminController
     {
         $form = new Form(new Farm());
 
-        $form->image('profile_picture', __('Farm image'));
-        $form->text('name', __('Name'))->rules('required');
+        $form->select('owner_id', __('Owner'))
+        ->options(\App\Models\Farmer::all()->mapWithKeys(function ($farmer) {
+            return [$farmer->id => $farmer->surname . ' ' . $farmer->given_name];
+        }))
+        ->rules('required');
+    
+        $form->text('name', __('Farm name'))->rules('required');
          //  //add a get gps coordinate button
          $form->html('<button type="button" id="getLocationButton">' . __('Get GPS Coordinates') . '</button>');
 
@@ -140,11 +131,11 @@ class FarmController extends AdminController
                  }
              });
          SCRIPT);
-        $form->select('location_id', __('SubCounty'))->options(\App\Models\Location::where('parent','!=',0)->pluck('name', 'id'))->rules('required');
+        $form->text('location', __('SubCounty'))->rules('required');
         $form->text('village', __('Village'));
         $form->text('parish', __('Parish'));
         $form->text('zone', __('Zone'));
-        $form->multipleSelect('breeds', __('Select Breeds'))->options(\App\Models\Breed::pluck('name', 'id'));
+        $form->text('breeds', __('Enter Breeds'));
         $form->text('production_type', __('Farm Type'))->rules('required')->help('e.g. Dairy, Beef, Eggs, etc.');
         $form->date('date_of_establishment', __('Date of establishment'))->default(date('Y-m-d'))->format('YYYY')->rules('required');
         $form->text('size', __('Land Size in acre'))->rules('required')->help('e.g. 10 acres, 20 acres, etc.');
@@ -154,15 +145,8 @@ class FarmController extends AdminController
               ->when('No', function (Form $form) {
                 $form->radio('no_land_ownership_reason', __('Type of land ownership'))->options(['Lease' => 'Lease', 'Rent' => 'Rent', 'Other' => 'Other'])->rules('required');
               })->rules('required');
-        $form->textarea('general_remarks', __('General remarks'));
-        $form->hidden('owner_id');
-
-        $form->saving(function (Form $form) {
-            if($form->isCreating()) {
-                $form->owner_id = auth()->user()->id;
-
-            }
-        });
+        $form->image('profile_picture', __('Farm image'));
+        $form->hidden('added_by')->value(Admin::user()->id);
 
         return $form;
     }
