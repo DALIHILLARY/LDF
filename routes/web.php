@@ -2,8 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FarmActivityController;
-use App\Admin\Controllers\HomeController;
-use App\Http\Controllers\VetController;
+use App\Admin\Controllers\HomeController; 
+
+use App\Admin\Controllers\FarmAnimalController;
+use App\Admin\Controllers\HealthRecordController;
 use Illuminate\Support\Facades\DB;
 use App\Models\FarmActivity;
 use Encore\Admin\Facades\Admin;
@@ -31,7 +33,9 @@ Route::get('/calendar', [FarmActivityController::class, 'index'])->name('event.i
 Route::get('/user-activity', [HomeController::class, 'index'])->name('user-activity');
 Route::get('/financial-summary-data', [HomeController::class, 'index'])->name('financial-summary-data');
 // routes/web.php
-Route::get('download/certificate/{id}', [VetController::class, 'downloadCertificate'])->name('download.certificate');
-Route::get('download/license/{id}', [VetController::class, 'downloadLicense'])->name('download.license');
+
+Route::get('farmers-farms/{id}', [FarmAnimalController::class, 'getFarms'])->name('farm.animals');
+Route::get('farms-animals/{id}', [HealthRecordController::class, 'getAnimals'])->name('farm.animals');
+Route::get('farmer-farms/{id}', [HealthRecordController::class, 'getFarms'])->name('farm.animals');
 
 

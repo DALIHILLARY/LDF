@@ -32,13 +32,11 @@
             <div class="col-lg-6 col-md-6 col-sm-6">
                 <div class="card panel-success">
                     <div class="card-header">
-                        <h3 class="card-title">{{__('Co-operatives')}}</h3>
+                        <h3 class="card-title">{{__('Farms')}}</h3>
                     </div>
                     <div class="card-body">
-                        <h4 class="mb-2"> {{ $data['total_cooperatives'] }}</h4>
-                        <p class="text-muted mb-0"><span class="text-danger fw-bold font-size-12 me-2"><i
-                                    class="glyphicon glyphicon-hourglass me-1 align-middle"></i>{{ $data['pending_cooperatives'] }}</span><a
-                                href="{{ admin_url('/cooperatives')}}">{{__('pending applications')}}</a></p>
+                        <h4 class="mb-2"> {{ $data['total_farms'] }}</h4>
+                      
                     </div>
                 </div>
             </div>

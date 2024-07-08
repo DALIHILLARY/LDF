@@ -1,6 +1,14 @@
 <?php
 
 use Illuminate\Routing\Router;
+use App\Admin\Controllers\UserController;
+use App\Admin\Controllers\FarmController;
+use App\Admin\Controllers\FarmerController;
+use App\Admin\Controllers\VetController;
+use App\Admin\Controllers\ServiceProviderController;
+use App\Admin\Controllers\HealthRecordController;
+use App\Admin\Controllers\FarmAnimalController;
+
 
 Admin::routes();
 
@@ -15,15 +23,10 @@ Route::group([
     $router->resource('users', UserController::class);
     $router->resource('farms', FarmController::class);
     $router->resource('farmers', FarmerController::class);
-    $router->resource('breeds', BreedController::class);
-    $router->resource('animals', AnimalController::class);
-    $router->resource('animal-health-records', AnimalHealthController::class);
-    $router->resource('vector-and-diseases', VectorAndDiseaseController::class);
     $router->resource('vets', VetController::class);
     $router->resource('service-providers', ServiceProviderController::class);
-    $router->resource('production-records', ProductionController::class);
-    $router->resource('financial-records', FinancialRecordController::class);
-    $router->resource('farm-activities', FarmActivityController::class);
-    $router->resource('livestock-types', LivestockTypeController::class);
-    $router->resource('cooperatives', CooperativeController::class);
+    $router->resource('health-records', HealthRecordController::class);
+    $router->resource('farm-animals', FarmAnimalController::class);
+
+   
 });

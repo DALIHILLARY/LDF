@@ -73,26 +73,6 @@ class FarmController extends AdminController
         
         $farm = Farm::findorFail($id);
         return view('farms_profile', compact('farm'));
-
-        // $show->field('profile_picture', __('Farm image'))->as(function ($profile_picture) {
-        //     if ($profile_picture == null) {
-        //         return 'No image';
-        //     }
-        //     return "<img src='/storage/$profile_picture' width='800px' height='400px' />";
-        // })->unescape();
-        // $show->field('name', __('Name'));
-        // $show->field('location', __('SubCounty'));
-        // $show->field('village', __('Village'));
-        // $show->field('parish', __('Parish'));
-        // $show->field('zone', __('Zone'));
-        // $show->field('production_type', __('Farm type'));
-        // $show->field('date_of_establishment', __('Date of establishment'));
-        // $show->field('size', __('Land size'));
-        // $show->field('number_of_workers', __('Number of workers'));
-        // $show->field('land_ownership', __('Land ownership'));
-    
-
-        return $show;
     }
 
     /**
