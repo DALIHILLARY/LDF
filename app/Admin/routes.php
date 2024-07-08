@@ -8,6 +8,7 @@ use App\Admin\Controllers\VetController;
 use App\Admin\Controllers\ServiceProviderController;
 use App\Admin\Controllers\HealthRecordController;
 use App\Admin\Controllers\FarmAnimalController;
+use App\Admin\Controllers\ParavetRequestController;
 
 
 Admin::routes();
@@ -27,6 +28,7 @@ Route::group([
     $router->resource('service-providers', ServiceProviderController::class);
     $router->resource('health-records', HealthRecordController::class);
     $router->resource('farm-animals', FarmAnimalController::class);
+    $router->resource('paravet-requests', ParavetRequestController::class);
 
    
 });

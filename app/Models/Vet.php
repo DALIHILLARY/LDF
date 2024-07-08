@@ -139,4 +139,14 @@ class Vet extends Model
         
 
     }
+
+    public function ratings()
+    {
+        return $this->hasMany(ParavetRating::class, 'paravet_id');
+    }
+
+    public function averageRating()
+    {
+        return $this->ratings()->avg('rating');
+    }
 }
