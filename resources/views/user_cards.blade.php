@@ -24,7 +24,7 @@
                         <h4 class="mb-2">{{ $data['total_farmers'] }}</h4>
                         <p class="text-muted mb-0"><span class="text-danger fw-bold font-size-12 me-2"><i
                                     class="glyphicon glyphicon-hourglass me-1 align-middle"></i>{{ $data['pending_farmers'] }}</span><a
-                                href="{{ admin_url('/seed-producers')}}">{{__('pending applications')}}</a></p>
+                                href="{{ admin_url('/farmers')}}">{{__('pending applications')}}</a></p>
                     </div>
                 </div>
             </div>
@@ -36,6 +36,9 @@
                     </div>
                     <div class="card-body">
                         <h4 class="mb-2"> {{ $data['total_farms'] }}</h4>
+                        <p class="text-muted mb-0"><span class="text-danger fw-bold font-size-12 me-2"><i
+                                    class="glyphicon glyphicon-hourglass me-1 align-middle"></i>{{ $data['pending_farmers'] }}</span><a
+                                href="{{ admin_url('/farms')}}">{{__('View farms')}}</a></p>
                       
                     </div>
                 </div>
@@ -54,7 +57,7 @@
                         <h4 class="mb-2"> {{ $data['total_input_providers'] }}</h4>
                         <p class="text-muted mb-0"><span class="text-danger fw-bold font-size-12 me-2"><i
                                     class="glyphicon glyphicon-hourglass me-1 align-middle"></i>{{ $data['pending_input_providers'] }}</span><a
-                                href="{{ admin_url('/individual-producers')}}">{{__('pending applications')}}</a></p>
+                                href="{{ admin_url('/service-providers')}}">{{__('pending applications')}}</a></p>
                     </div>
                 </div>
             </div>

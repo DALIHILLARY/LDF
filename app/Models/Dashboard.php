@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Admin\Controllers\ParavetRequestController;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\AnimalHealthRecord;
@@ -68,6 +69,19 @@ class Dashboard extends Model
         ];
 
         return view('user_cards', ['data' => $data]);
+    }
+
+    //function to get paravet requests
+
+    public static function paravetRequests()
+    {
+        // Fetch the data from the database
+        $serviceRequestsCount = ParavetRequest::count();
+        $completedServicesCount = ParavetRequest::where('status', 'completed')->count();
+        $pendingServicesCount = ParavetRequest::where('status', 'pending')->count();
+
+        // Pass the data to the view
+        return view('requests', compact('serviceRequestsCount', 'completedServicesCount', 'pendingServicesCount'));
     }
 
     
