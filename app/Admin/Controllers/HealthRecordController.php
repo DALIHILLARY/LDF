@@ -114,7 +114,16 @@ class HealthRecordController extends AdminController
         $form->textarea('follow_up_actions', __('Follow up actions'));
 
         $form->divider('General Observations');
-        $form->textarea('overall_health_status', __('Overall health status'));
+        $form->select('overall_health_status', __('Overall health status'))->options
+        (['healthy' => 'Healthy', 
+        'sick' => 'Sick', 
+        'injured' => 'Injured', 
+        'recovering' => 'Recovering',
+        'critical' => 'Critical',
+        'quarantined' => 'Quarantined',
+        'under_observation' => 'Under observation',
+        'euathanized' => 'Euthanized',
+        'unknown' => 'Unknown']);
         $form->textarea('environmental_factors', __('Environmental factors'));
         $form->textarea('notes', __('Notes'));
 

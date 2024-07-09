@@ -33,6 +33,16 @@ class HomeController extends Controller
                 $row->column(6, function (Column $column) {
                     $column->append(Dashboard::paravetRequests());
                 });
+            })
+
+            ->row(function (Row $row) {
+                $row->column(6, function (Column $column) {
+                    $column->append(Dashboard::topRatedParavets());
+                });
+                $row->column(6, function (Column $column) {
+                    $column->append(Dashboard::showHealthRecords());
+                });
+                
             });
     
     }

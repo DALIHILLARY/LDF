@@ -9,6 +9,7 @@ use App\Models\AnimalHealthRecord;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
+
 class Dashboard extends Model
 {
     use HasFactory;
@@ -83,6 +84,33 @@ class Dashboard extends Model
         // Pass the data to the view
         return view('requests', compact('serviceRequestsCount', 'completedServicesCount', 'pendingServicesCount'));
     }
+
+
+    //function to get top rated paravets
+    public static function topRatedParavets()
+    {
+        $topVets = Vet::with('ratings')
+        ->withCount('ratings')
+        ->get()
+        ->sortByDesc(function ($vet) {
+            return $vet->averageRating();
+        })
+        ->take(5);
+
+    return view('top_vets', compact('topVets'));
+    }
+
+    //function to get overall health status
+    public static function showHealthRecords()
+{
+    // Fetch data from the database
+    $healthStatusCounts = HealthRecord::select('overall_health_status', DB::raw('count(*) as total'))
+        ->groupBy('overall_health_status')
+        ->pluck('total', 'overall_health_status')
+        ->toArray();
+
+    return view('health_records_chart', compact('healthStatusCounts'));
+}
 
     
 }
