@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\RatingController;
 use App\Models\Dashboard;
 use Encore\Admin\Layout\Column;
 use Encore\Admin\Layout\Content;
@@ -30,13 +31,19 @@ class HomeController extends Controller
                     $column->append(Dashboard::userMetrics(request()));
                 });
             });
-            
-
-          
-
-
-     
     
+    }
+
+    public function ratings(Content $content)
+    {
+        $content
+            ->title('Paravet Ratings');
+        $content->row(function (Row $row) {
+            $row->column(12, function (Column $column) {
+                $column->append(RatingController::index());
+            });
+        });
+        return $content;
     }
 
   

@@ -27,12 +27,18 @@ class RatingController extends Controller
         return('Rating submitted successfully');
     }
 
-    public function show(Vet $paravet)
+    public static function index()
     {
-        return view('ratings', [
-            'paravet' => $paravet,
-            'ratings' => $paravet->ratings()->latest()->get(),
-            'averageRating' => $paravet->averageRating(),
-        ]);
+        // Fetch all paravets with their ratings and average rating
+        $paravets = Vet::with(['ratings' => function ($query) {
+            $query->latest(); // Fetch ratings in descending order by default
+        }])->get();
+    
+        // Calculate average ratings for each paravet
+        $paravets->each(function ($paravet) {
+            $paravet->averageRating = $paravet->averageRating();
+        });
+    
+        return view('ratings', compact('paravets'));
     }
 }

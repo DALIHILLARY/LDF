@@ -26,20 +26,15 @@ use Illuminate\Http\Request;
 */
 
 Route::view('auth/register', 'auth.register');
-
-// routes/web.php
-
-Route::get('/calendar', [FarmActivityController::class, 'index'])->name('event.index');
-//Route::post('/calendar/events', [FarmActivityController::class, 'store'])->name('event.store');
 Route::get('/user-activity', [HomeController::class, 'index'])->name('user-activity');
-Route::get('/financial-summary-data', [HomeController::class, 'index'])->name('financial-summary-data');
-// routes/web.php
+
 
 Route::get('farmers-farms/{id}', [FarmAnimalController::class, 'getFarms'])->name('farm.animals');
 Route::get('farms-animals/{id}', [HealthRecordController::class, 'getAnimals'])->name('farm.animals');
 Route::get('farmer-farms/{id}', [HealthRecordController::class, 'getFarms'])->name('farm.animals');
 
 Route::post('/ratings', [RatingController::class, 'store'])->name('ratings.store');
-Route::get('/paravets/{paravet}', [RatingController::class, 'show']);
+Route::get('/paravets', [RatingController::class, 'index'])->name('paravet-ratings.index');
+Route::get('/paravet-ratings', [HomeController::class, 'ratings']);
 
 
