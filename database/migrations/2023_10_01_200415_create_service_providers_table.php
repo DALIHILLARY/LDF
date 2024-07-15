@@ -33,7 +33,7 @@ return new class extends Migration
             $table->string('status')->default('pending');
             $table->json('other_documents')->nullable();
             $table->unsignedInteger('user_id');
-            $table->unsignedInteger('added_by');
+            $table->unsignedInteger('added_by')->nullable();
             $table->softDeletes();
             $table->timestamps();
 

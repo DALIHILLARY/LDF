@@ -24,7 +24,7 @@ class ServiceProvider extends Model
         'postal_address',
         'other_services',
         'logo',
-        'distroict_of_operation',
+        'district_of_operation',
         'NDA_registration_number',
         'tin_number_business',
         'tin_number_owner',
@@ -40,41 +40,48 @@ class ServiceProvider extends Model
     protected static function boot()
     {
         parent::boot();
-
         static::creating(function ($model) {
-            //check if its the admin creating the form or ldf
-            if(auth('admin')->user()->inRoles(['administrator','ldf_admin']))
-            {
-                //check if the user with the same email exists
-                $user = User::where('email', $model->email) 
-                ->orWhere('username', $model->email)
-                ->first();
-                if(!$user){
-                   //create a new user and assign the user_id to the vet
+            // Check if it's the admin creating the form or LDF
+            $user = auth('admin')->user();
+            
+            if (!$user) {
+                return;  // Exit early if no user
+            }
+        
+            if ($user->inRoles(['administrator', 'ldf_admin'])) {
+                // Check if the user with the same email exists
+                $existingUser = User::where('email', $model->email)
+                    ->orWhere('username', $model->email)
+                    ->first();
+                
+                if (!$existingUser) {
+                    // Create a new user and assign the user_id to the vet
                     $new_user = new User();
                     $new_user->username = $model->email;
-                    $new_user->name = $model->surname.' '.$model->given_name;
+                    $new_user->name = $model->surname . ' ' . $model->given_name;
                     $new_user->email = $model->email;
                     $new_user->password = bcrypt('password');
                     $new_user->avatar = $model->profile_picture ? $model->profile_picture : 'images/default_image.png';
                     $new_user->save();
-
-                    
+        
                     $model->user_id = $new_user->id;
                 }
-               
             }
-           
         });
+        
 
           //call back to send a notification to the user
           self::created(function ($model) 
           {
-               
+            
 
-                Notification::send_notification($model, 'ServiceProvider', request()->segment(count(request()->segments())));
+                $user = auth('admin')->user();
+            
+                if (!$user) {
+                    return;  // Exit early if no user
+                }
 
-                if(auth('admin')->user()->inRoles(['administrator','ldf_admin']))
+                if($user->inRoles(['administrator','ldf_admin']))
                 {
                     $new_user = User::where('email', $model->email)
                     ->orWhere('username', $model->email)
@@ -90,6 +97,7 @@ class ServiceProvider extends Model
 
            //callback to create a user with the vet credentials after if the status is approved 
            self::updating(function ($model){
+
                 if($model->status == 'approved'){
                     $user = User::where('email', $model->email) 
                     ->orWhere('username', $model->email)
@@ -115,16 +123,22 @@ class ServiceProvider extends Model
             //call back to send a notification to the user
             self::updated(function ($model) 
             {
-                Notification::update_notification($model, 'ServiceProvider', request()->segment(count(request()->segments())-1));
+                $user = $model->user_id;
+                 if(!$user){
+                    return;
+                 }
 
-                $new_user = User::where('email', $model->email)
-                ->orWhere('username', $model->email)
-                ->first();
-                $new_role = new AdminRoleUser();
-                $new_role->role_id = 3;
-                $new_role->user_id = $new_user->id;
-                $new_role->save();
-                
+                 else{
+                    Notification::update_notification($model, 'ServiceProvider', request()->segment(count(request()->segments())-1));
+
+                    $new_user = User::where('email', $model->email)
+                    ->orWhere('username', $model->email)
+                    ->first();
+                    $new_role = new AdminRoleUser();
+                    $new_role->role_id = 3;
+                    $new_role->user_id = $new_user->id;
+                    $new_role->save();
+                 }
  
             });
 
