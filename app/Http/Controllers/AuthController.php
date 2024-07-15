@@ -64,13 +64,15 @@ class AuthController extends Controller
                 return response()->json(['error' => 'Token not provided'], 400);
             }
         
-            // Prepend "Bearer " to the token if it doesn't already start with it
-            if (!Str::startsWith($token, 'Bearer ')) {
-                $token = 'Bearer ' . $token;
-            }
-        
             try {
-                JWTAuth::parseToken()->invalidate(); // Invalidate the parsed token
+                // Check if the token is valid before invalidating it
+                if (!JWTAuth::parseToken()->check()) {
+                    return response()->json(['error' => 'Token is invalid or expired'], 401);
+                }
+        
+                // Invalidate the token
+                JWTAuth::parseToken()->invalidate();
+        
                 return response()->json(['message' => 'Successfully logged out'], 200);
             } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
                 return response()->json(['error' => 'Token is invalid'], 401);
