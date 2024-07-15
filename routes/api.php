@@ -38,6 +38,7 @@ Route::group(['middleware' => ['auth:api']], function () {
     //     return response()->json(['error' => 'Unauthorized'], 401);
     // }
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/user', [AuthController::class, 'getAuthenticatedUser']);
 });
 
 

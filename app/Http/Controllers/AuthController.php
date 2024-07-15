@@ -80,6 +80,28 @@ class AuthController extends Controller
                 return response()->json(['error' => 'Could not invalidate token: ' . $e->getMessage()], 500);
             }
         }
+
+
+        //function to get the authenticated user
+        public function getAuthenticatedUser()
+        {
+            try {
+                $user = JWTAuth::parseToken()->authenticate();
+        
+                if (!$user) {
+                    return response()->json(['error' => 'user_not_found'], 404);
+                }
+        
+                return response()->json(compact('user'));
+            } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
+                return response()->json(['error' => 'token_expired', $e->getMessage()], 500);
+            } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
+                return response()->json(['error' => 'token_invalid', $e->getMessage()],401);
+            } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
+                return response()->json(['error' => 'token_absent', $e->getMessage()],500);
+            }
+        }
+        
         
         
         
