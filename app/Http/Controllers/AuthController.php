@@ -3,126 +3,82 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\AdminRoleUser;
 use App\Models\User;
-use App\Models\Utils;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
-use Encore\Admin\Auth\Database\Administrator;
+use Illuminate\Support\Str;
+use Tymon\JWTAuth\Exceptions\JWTException;
+
 
 class AuthController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        header('Content-Type: application/json');
+        //Register a new user
+        public function register(Request $request)
+        {
+            $validator = Validator::make($request->all(), [
+                'username' => 'required|string|max:255',
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:admin_users',
+                'password' => 'required|string|min:6|confirmed',
+            ]);
 
-        $requestUrl = request()->path();
-        $segments = explode('/', $requestUrl);
-        $lastSegment = end($segments);
+            if ($validator->fails()) {
+                return response()->json($validator->errors(), 400);
+            }
 
-        if ($lastSegment != 'login' && $lastSegment != 'register') {
-            $u = auth('api')->user();
-            if ($u == null) {
-                die(json_encode(['code' => 0, 'message' => 'Unauthorized']));
+            $user = User::create([
+                'username' => $request->username,
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
+
+            $token = JWTAuth::fromUser($user);
+
+            return response()->json([
+                'user' => $user,
+                'token' => $token
+            ], 201);
+        }
+
+        //login function
+        public function login(Request $request)
+        {
+            $credentials = $request->only('email', 'password');
+
+            if (!$token = JWTAuth::attempt($credentials)) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+
+            return response()->json(['token' => $token]);
+        }
+
+
+        //logout function
+        public function logout(Request $request)
+        {
+            $token = $request->bearerToken();
+            
+            if (!$token) {
+                return response()->json(['error' => 'Token not provided'], 400);
+            }
+        
+            // Prepend "Bearer " to the token if it doesn't already start with it
+            if (!Str::startsWith($token, 'Bearer ')) {
+                $token = 'Bearer ' . $token;
+            }
+        
+            try {
+                JWTAuth::parseToken()->invalidate(); // Invalidate the parsed token
+                return response()->json(['message' => 'Successfully logged out'], 200);
+            } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
+                return response()->json(['error' => 'Token is invalid'], 401);
+            } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
+                return response()->json(['error' => 'Could not invalidate token: ' . $e->getMessage()], 500);
             }
         }
-        // die("my api");
-    }
-
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
-    public function index()
-    {
-        die('test');
-    }
-    public function profile()
-    {
-        $u = auth('api')->user();
-        if ($u == null) {
-            return Utils::apiError('Unauthorized');
-        }
-        return Utils::apiSuccess($u);
-    }
-
-    
-    public function register(Request $request)
-    {
-        if ($request->name == null) {
-            return Utils::apiError('Name is required.');
-        }
-        if ($request->email == null) {
-            return Utils::apiError('Email is required.');
-        }
-        if ($request->password == null) {
-            return Utils::apiError('Password is required.');
-        }
-        $user = User::where('email', $request->email)
-            ->orWhere('username', $request->email)
-            ->first();
-        if ($user != null) {
-            return Utils::apiError('Email already exists.');
-        }
-        $newUser = new User();
-        $newUser->name = $request->name;
-        $newUser->email = $request->email;
-        $newUser->username = $request->email;
-        $newUser->password = password_hash($request->password, PASSWORD_DEFAULT);
         
-        try {
-            $newUser->save();
-            $role = new AdminRoleUser();
-            $role->user_id = $newUser->id;
-            $role->role_id = 3;
-            $role->save();
-        } catch (\Throwable $th) {
-            return Utils::apiError('Error saving user. ' . $th->getMessage());
-        }
-
-        $loggedinUser = User::where('email', $request->email)->first();
-
-        JWTAuth::factory()->setTTL(60 * 24 * 30 * 12);
-        $token = auth('api')->attempt([
-            'email' => $loggedinUser->email,
-            'password' => $request->password,
-        ]);
-        $loggedinUser->token = $token;
-        return Utils::apiSuccess($loggedinUser, 'User registered successfully.');
-    }
-
-    public function login(Request $request)
-    {
-
-        if ($request->username == null) {
-            return Utils::apiError('Username is required.');
-        }
-        if ($request->password == null) {
-            return Utils::apiError('Password is required.');
-        }
-        $u = Administrator::where('username', $request->username)
-        ->with('roles') // Assuming 'role' is the name of the relationship in your User model
-        ->first();
-        if ($u == null) {
-            return Utils::apiError('User account not found.');
-        }
-
-
-        JWTAuth::factory()->setTTL(60 * 24 * 30 * 12);
-        $token = auth('api')->attempt([
-            'username' => $u->username,
-            'password' => $request->password,
-        ]);
-
-        if ($token == null) {
-            return Utils::apiError('Invalid credentials.');
-        }
-        $u->token = $token;
-        return Utils::apiSuccess($u, 'User logged in successfully.');
-    }
+        
+        
 }

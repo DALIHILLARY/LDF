@@ -7,12 +7,6 @@ use App\Admin\Controllers\HomeController;
 use App\Admin\Controllers\FarmAnimalController;
 use App\Admin\Controllers\HealthRecordController;
 use App\Http\Controllers\RatingController;
-use Illuminate\Support\Facades\DB;
-use App\Models\FarmActivity;
-use Encore\Admin\Facades\Admin;
-use Illuminate\Http\Request;
-
-
 
 /*
 |--------------------------------------------------------------------------
@@ -36,5 +30,6 @@ Route::get('farmer-farms/{id}', [HealthRecordController::class, 'getFarms'])->na
 Route::post('/ratings', [RatingController::class, 'store'])->name('ratings.store');
 Route::get('/paravets', [RatingController::class, 'index'])->name('paravet-ratings.index');
 Route::get('/paravet-ratings', [HomeController::class, 'ratings']);
+
 
 

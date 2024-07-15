@@ -56,6 +56,7 @@ class Dashboard extends Model
         return response()->json($events);
     }
 
+
     //function to get the totals
     public static function cards()
     {
@@ -73,7 +74,6 @@ class Dashboard extends Model
     }
 
     //function to get paravet requests
-
     public static function paravetRequests()
     {
         // Fetch the data from the database
@@ -97,20 +97,20 @@ class Dashboard extends Model
         })
         ->take(5);
 
-    return view('top_vets', compact('topVets'));
+       return view('top_vets', compact('topVets'));
     }
 
     //function to get overall health status
     public static function showHealthRecords()
-{
-    // Fetch data from the database
-    $healthStatusCounts = HealthRecord::select('overall_health_status', DB::raw('count(*) as total'))
-        ->groupBy('overall_health_status')
-        ->pluck('total', 'overall_health_status')
-        ->toArray();
+    {
+        // Fetch data from the database
+        $healthStatusCounts = HealthRecord::select('overall_health_status', DB::raw('count(*) as total'))
+            ->groupBy('overall_health_status')
+            ->pluck('total', 'overall_health_status')
+            ->toArray();
 
-    return view('health_records_chart', compact('healthStatusCounts'));
-}
+        return view('health_records_chart', compact('healthStatusCounts'));
+    }
 
     
 }
