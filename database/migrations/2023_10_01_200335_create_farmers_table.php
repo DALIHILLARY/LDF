@@ -35,7 +35,7 @@ return new class extends Migration
             $table->string('credit_institution')->nullable();
             $table->string('date_started_farming')->nullable();
             $table->string('highest_level_of_education')->nullable();
-            $table->unsignedInteger('added_by');
+            $table->unsignedInteger('added_by')->nullable();
             $table->unsignedInteger('user_id');
             $table->string('status')->nullable();
             $table->timestamps();
