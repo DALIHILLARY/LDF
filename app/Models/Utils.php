@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Utils extends Model
 {
@@ -93,5 +94,21 @@ class Utils extends Model
         }
     
     
+    }
+
+    //storing images from the api
+    public static function storeBase64Image($base64Image, $directory)
+    {
+        if ($base64Image) {
+            list($type, $imageData) = explode(';', $base64Image);
+            list(, $imageData) = explode(',', $imageData);
+            $imageData = base64_decode($imageData);
+
+            $filePath = $directory . '/' . uniqid() . '.jpg';
+            Storage::disk('admin')->put($filePath, $imageData);
+
+            return $filePath;
+        }
+        return null;
     }
 }

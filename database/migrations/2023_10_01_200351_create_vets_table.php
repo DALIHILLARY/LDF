@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('vets', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('user_id');
+            $table->unsignedInteger('user_id')->nullable();
             $table->string('profile_picture')->nullable();
             $table->string('title');
             $table->string('category')->nullable()->comment('Paravet or Vet');
@@ -40,7 +40,7 @@ return new class extends Migration
             $table->string('license')->nullable();
             $table->json('other_documents')->nullable();
             $table->string('status')->default('pending');
-            $table->unsignedInteger('added_by');
+            $table->unsignedInteger('added_by')->nullable();
             $table->timestamps();
             $table->softDeletes();
 

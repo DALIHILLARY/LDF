@@ -8,9 +8,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Vet extends Model
 {
-    use HasFactory;
-    use SoftDeletes;
-    
+    use HasFactory, SoftDeletes;
+   
     protected $fillable=[
         'profile_picture',
         'title',
@@ -47,40 +46,47 @@ class Vet extends Model
     protected static function boot()
     {
         parent::boot();
-
         static::creating(function ($model) {
-            //check if its the admin creating the form or ldf
-            if(auth('admin')->user()->inRoles(['administrator','ldf_admin']))
-            {
-                //check if the user with the same email exists
-                $user = User::where('email', $model->email) 
-                ->orWhere('username', $model->email)
-                ->first();
-                if(!$user){
-                   //create a new user and assign the user_id to the vet
+            // Check if it's the admin creating the form or LDF
+            $user = auth('admin')->user();
+            
+            if (!$user) {
+                return;  // Exit early if no user
+            }
+        
+            if ($user->inRoles(['administrator', 'ldf_admin'])) {
+                // Check if the user with the same email exists
+                $existingUser = User::where('email', $model->email)
+                    ->orWhere('username', $model->email)
+                    ->first();
+                
+                if (!$existingUser) {
+                    // Create a new user and assign the user_id to the vet
                     $new_user = new User();
                     $new_user->username = $model->email;
-                    $new_user->name = $model->surname.' '.$model->given_name;
+                    $new_user->name = $model->surname . ' ' . $model->given_name;
                     $new_user->email = $model->email;
                     $new_user->password = bcrypt('password');
                     $new_user->avatar = $model->profile_picture ? $model->profile_picture : 'images/default_image.png';
                     $new_user->save();
-
-                    
+        
                     $model->user_id = $new_user->id;
                 }
-               
             }
-           
         });
 
           //call back to send a notification to the user
           self::created(function ($model) 
           {
-               
+            
 
-                Notification::send_notification($model, 'Vet', request()->segment(count(request()->segments())));
-                if(auth('admin')->user()->inRoles(['administrator','ldf_admin']))
+                $user = auth('admin')->user();
+            
+                if (!$user) {
+                    return;  // Exit early if no user
+                }
+
+                if($user->inRoles(['administrator','ldf_admin']))
                 {
                     $new_user = User::where('email', $model->email)
                     ->orWhere('username', $model->email)
@@ -121,22 +127,25 @@ class Vet extends Model
             //call back to send a notification to the user
             self::updated(function ($model) 
             {
-                Notification::update_notification($model, 'Vet', request()->segment(count(request()->segments())-1));
+                $user = $model->user_id;
+                 if(!$user){
+                    return;
+                 }
 
-                $new_user = User::where('email', $model->email)
-                ->orWhere('username', $model->email)
-                ->first();
-                $new_role = new AdminRoleUser();
-                $new_role->role_id = 3;
-                $new_role->user_id = $new_user->id;
-                $new_role->save();
-                
+                 else{
+                    Notification::update_notification($model, 'ServiceProvider', request()->segment(count(request()->segments())-1));
+
+                    $new_user = User::where('email', $model->email)
+                    ->orWhere('username', $model->email)
+                    ->first();
+                    $new_role = new AdminRoleUser();
+                    $new_role->role_id = 3;
+                    $new_role->user_id = $new_user->id;
+                    $new_role->save();
+                 }
  
             });
-
-    
-         
-        
+     
 
     }
 

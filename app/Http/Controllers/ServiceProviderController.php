@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\ServiceProvider;
-use Illuminate\Support\Facades\Storage;
+use App\Models\Utils;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class ServiceProviderController extends Controller
 {
@@ -21,39 +23,48 @@ class ServiceProviderController extends Controller
 
     public function store(Request $request)
     {
+         // Define validation rules
+    $rules = [
+        'name' => 'required|string|max:255',
+        'owner_name' => 'required|string|max:255',
+        'owner_profile' => 'required|string',
+        'class_of_service' => 'required|string',
+        'date_of_registration' => 'required|date|before_or_equal:today',
+        'physical_address' => 'required|string|max:255',
+        'primary_phone_number' => 'required|string|max:15',
+        'secondary_phone_number' => 'nullable|string|max:15',
+        'email' => 'nullable|email|max:255|unique:service_providers',
+        'postal_address' => 'nullable|string|max:255',
+        'other_services' => 'nullable|string',
+        'logo' => 'nullable|string', // Accepting base64 string
+        'district_of_operation' => 'required|string|max:255',
+        'tin_number_business' => 'required|string|max:255',
+        'tin_number_owner' => 'nullable|string|max:255',
+        'NDA_registration_number' => 'required|string', // Accepting base64 string
+        'license' => 'required|string', // Accepting base64 string
+        'other_documents' => 'nullable|array',
+        'other_documents.*' => 'string', // Accepting base64 strings
+    ];
+
+    try {
         // Validate the incoming request data
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'owner_name' => 'required|string|max:255',
-            'owner_profile' => 'required|string',
-            'class_of_service' => 'required|string',
-            'date_of_registration' => 'required|date|before_or_equal:today',
-            'physical_address' => 'required|string|max:255',
-            'primary_phone_number' => 'required|string|max:15',
-            'secondary_phone_number' => 'nullable|string|max:15',
-            'email' => 'nullable|email|max:255',
-            'postal_address' => 'nullable|string|max:255',
-            'other_services' => 'nullable|string',
-            'logo' => 'nullable|string', // Accepting base64 string
-            'district_of_operation' => 'required|string|max:255',
-            'tin_number_business' => 'required|string|max:255',
-            'tin_number_owner' => 'nullable|string|max:255',
-            'NDA_registration_number' => 'required|string', // Accepting base64 string
-            'license' => 'required|string', // Accepting base64 string
-            'other_documents' => 'nullable|array',
-            'other_documents.*' => 'string', // Accepting base64 strings
-        
-        ]);
+        $validatedData = Validator::make($request->all(), $rules)->validate();
+    } catch (ValidationException $e) {
+        return response()->json([
+            'message' => 'Validation failed',
+            'errors' => $e->errors()
+        ], 422);
+    }
 
         // Handle base64 file uploads
-        $validatedData['logo'] = $this->storeBase64Image($request->input('logo'), 'images');
-        $validatedData['NDA_registration_number'] = $this->storeBase64Image($request->input('NDA_registration_number'), 'files');
-        $validatedData['license'] = $this->storeBase64Image($request->input('license'), 'files');
+        $validatedData['logo'] = Utils::storeBase64Image($request->input('logo'), 'images');
+        $validatedData['NDA_registration_number'] = Utils::storeBase64Image($request->input('NDA_registration_number'), 'files');
+        $validatedData['license'] = Utils::storeBase64Image($request->input('license'), 'files');
 
         if ($request->has('other_documents')) {
             $other_documents = [];
             foreach ($request->input('other_documents') as $document) {
-                $other_documents[] = $this->storeBase64Image($document, 'files');
+                $other_documents[] = Utils::storeBase64Image($document, 'files');
             }
             $validatedData['other_documents'] = json_encode($other_documents);
         }
@@ -66,48 +77,58 @@ class ServiceProviderController extends Controller
     public function update(Request $request, $id)
     {
         // Validate the incoming request data
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'owner_name' => 'required|string|max:255',
-            'owner_profile' => 'required|string',
-            'class_of_service' => 'required|string',
-            'date_of_registration' => 'required|date|before_or_equal:today',
-            'physical_address' => 'required|string|max:255',
-            'primary_phone_number' => 'required|string|max:15',
-            'secondary_phone_number' => 'nullable|string|max:15',
-            'email' => 'nullable|email|max:255',
-            'postal_address' => 'nullable|string|max:255',
-            'other_services' => 'nullable|string',
-            'logo' => 'nullable|string', // Accepting base64 string
-            'district_of_operation' => 'required|string|max:255',
-            'tin_number_business' => 'required|string|max:255',
-            'tin_number_owner' => 'nullable|string|max:255',
-            'NDA_registration_number' => 'required|string', // Accepting base64 string
-            'license' => 'required|string', // Accepting base64 string
-            'other_documents' => 'nullable|array',
-            'other_documents.*' => 'string', // Accepting base64 strings
-        ]);
-    
+        // Define validation rules
+    $rules = [
+        'name' => 'required|string|max:255',
+        'owner_name' => 'required|string|max:255',
+        'owner_profile' => 'required|string',
+        'class_of_service' => 'required|string',
+        'date_of_registration' => 'required|date|before_or_equal:today',
+        'physical_address' => 'required|string|max:255',
+        'primary_phone_number' => 'required|string|max:15',
+        'secondary_phone_number' => 'nullable|string|max:15',
+        'email' => 'nullable|email|max:255|unique:service_providers,email',
+        'postal_address' => 'nullable|string|max:255',
+        'other_services' => 'nullable|string',
+        'logo' => 'nullable|string', // Accepting base64 string
+        'district_of_operation' => 'required|string|max:255',
+        'tin_number_business' => 'required|string|max:255',
+        'tin_number_owner' => 'nullable|string|max:255',
+        'NDA_registration_number' => 'required|string', // Accepting base64 string
+        'license' => 'required|string', // Accepting base64 string
+        'other_documents' => 'nullable|array',
+        'other_documents.*' => 'string', // Accepting base64 strings
+    ];
+
+    try {
+        // Validate the incoming request data
+        $validatedData = Validator::make($request->all(), $rules)->validate();
+    } catch (ValidationException $e) {
+        return response()->json([
+            'message' => 'Validation failed',
+            'errors' => $e->errors()
+        ], 422);
+    }
         // Find the service provider by ID
         $serviceProvider = ServiceProvider::findOrFail($id);
     
         // Handle base64 file uploads
         if ($request->has('logo')) {
-            $validatedData['logo'] = $this->storeBase64Image($request->input('logo'), 'images');
+            $validatedData['logo'] = Utils::storeBase64Image($request->input('logo'), 'images');
         }
     
         if ($request->has('NDA_registration_number')) {
-            $validatedData['NDA_registration_number'] = $this->storeBase64Image($request->input('NDA_registration_number'), 'files');
+            $validatedData['NDA_registration_number'] = Utils::storeBase64Image($request->input('NDA_registration_number'), 'files');
         }
     
         if ($request->has('license')) {
-            $validatedData['license'] = $this->storeBase64Image($request->input('license'), 'files');
+            $validatedData['license'] = Utils::storeBase64Image($request->input('license'), 'files');
         }
     
         if ($request->has('other_documents')) {
             $other_documents = [];
             foreach ($request->input('other_documents') as $document) {
-                $other_documents[] = $this->storeBase64Image($document, 'files');
+                $other_documents[] = Utils::storeBase64Image($document, 'files');
             }
             $validatedData['other_documents'] = json_encode($other_documents);
         }
@@ -138,18 +159,5 @@ class ServiceProviderController extends Controller
      * @param  string $directory
      * @return string|null
      */
-    private function storeBase64Image($base64Image, $directory)
-    {
-        if ($base64Image) {
-            list($type, $imageData) = explode(';', $base64Image);
-            list(, $imageData) = explode(',', $imageData);
-            $imageData = base64_decode($imageData);
-
-            $filePath = $directory . '/' . uniqid() . '.jpg';
-            Storage::disk('admin')->put($filePath, $imageData);
-
-            return $filePath;
-        }
-        return null;
-    }
+  
 }
