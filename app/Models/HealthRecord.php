@@ -13,7 +13,8 @@ class HealthRecord extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'cattle_id',
+        'farm_id',
+        'animal_id',
         'paravet_id',
         'visit_date',
         'weight',

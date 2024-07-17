@@ -176,7 +176,7 @@ class HealthRecordController extends AdminController
         ");
 
         //ignore the farmer_id when submitting and farm_id
-        $form->ignore(['farmer_id', 'farm_id']);
+        $form->ignore('farmer_id');
 
         return $form;
        

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('animal_id');
             $table->unsignedBigInteger('paravet_id');
+            $table->unsignedBigInteger('farm_id');
             $table->date('visit_date');
             $table->decimal('weight', 5, 2)->nullable();
             $table->decimal('body_temperature', 4, 2)->nullable();
@@ -42,6 +43,7 @@ return new class extends Migration
             $table->softDeletes();
 
             $table->foreign('animal_id')->references('id')->on('farm_animals')->onDelete('cascade');
+            $table->foreign('farm_id')->references('id')->on('farms')->onDelete('cascade');
             $table->foreign('paravet_id')->references('id')->on('vets');
         });
     }

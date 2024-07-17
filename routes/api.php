@@ -7,6 +7,7 @@ use App\Http\Controllers\VetsController;
 use App\Http\Controllers\FarmerController;
 use App\Http\Controllers\FarmController;
 use App\Http\Controllers\FarmAnimalController;
+use App\Http\Controllers\HealthRecordController;
 
 /*
 |--------------------------------------------------------------------------
@@ -57,6 +58,14 @@ Route::group(['middleware' => ['auth:api']], function ()
     //farm animals registration routes
     Route::resource('/animals', FarmAnimalController::class);
     Route::get('/farm-animals/{id}', [FarmAnimalController::class, 'getFarmAnimalsByFarm']);
+
+    //health records registration routes
+    Route::resource('/health-records', HealthRecordController::class);
+    Route::get('/health-records-by-animal/{id}', [HealthRecordController::class, 'showHealthRecordsByAnimal']);
+    Route::get('/health-records-by-farm/{id}', [HealthRecordController::class, 'showHealthRecordsByFarm']);
+    Route::get('/health-records-by-vet/{id}', [HealthRecordController::class, 'showHealthRecordsByVet']);
+    Route::get('/health-records-by-date/{date}', [HealthRecordController::class, 'showHealthRecordsByDate']);
+    
 
 });
 
