@@ -5,6 +5,7 @@ use App\Http\Controllers\ServiceProviderController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VetsController;
 use App\Http\Controllers\FarmerController;
+use App\Http\Controllers\FarmController;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,6 +47,10 @@ Route::delete('/delete-farmers/{id}', [FarmerController::class, 'destroy']);
 Route::group(['middleware' => ['auth:api']], function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'getAuthenticatedUser']);
+    Route::get('/farmers-farms/{id}', [FarmController::class, 'showFarmerFarms']);
+
+    //resource routes
+    Route::resource('/farms', FarmController::class);
 
 });
 

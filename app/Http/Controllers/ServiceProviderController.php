@@ -144,6 +144,29 @@ class ServiceProviderController extends Controller
     {
         // Find the service provider by ID
         $serviceProvider = ServiceProvider::findOrFail($id);
+
+        //delete all iamges and files associated with the service provider
+        // Array of properties to check and delete if they exist
+        $propertiesToCheck = [
+            'logo',
+            'NDA_registration_number',
+            'license',
+            'other_documents'
+        ];
+
+        foreach ($propertiesToCheck as $property) {
+            if ($serviceProvider->$property) {
+                // If the property is 'other_documents', handle it as a JSON array
+                if ($property === 'other_documents') {
+                    $documents = json_decode($serviceProvider->$property);
+                    foreach ($documents as $document) {
+                        Utils::deleteImage($document);
+                    }
+                } else {
+                    Utils::deleteImage($serviceProvider->$property);
+                }
+            }
+        }
         
         // Delete the service provider
         $serviceProvider->delete();

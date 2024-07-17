@@ -42,6 +42,12 @@ class Farmer extends Model
 
     ];
 
+    //relationship between the farmer and a farm
+    public function farms()
+    {
+        return $this->hasMany(Farm::class, 'owner_id');
+    }
+
     protected static function boot()
     {
         parent::boot();

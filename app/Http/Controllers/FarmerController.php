@@ -8,6 +8,7 @@ use App\Models\Farmer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Storage;
 use App\Models\Utils;
 
 class FarmerController extends Controller
@@ -136,7 +137,18 @@ class FarmerController extends Controller
 
     public function destroy($id)
     {
-        Farmer::findOrFail($id)->delete();
+        $farmer = Farmer::findOrFail($id);
+
+        //delete all farms associated with the farmer
+        $farmer->farms()->delete();
+
+        //delete all files and images associated with the farmer
+        if($farmer->profile_picture) {
+            Utils::deleteImage($farmer->profile_picture);
+        }
+
+        $farmer->delete();
+
         return response()->json([
             'message' => 'Farmer deleted successfully'
         ], 200);

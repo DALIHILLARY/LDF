@@ -111,4 +111,12 @@ class Utils extends Model
         }
         return null;
     }
+
+    //function to delete images and files from the storage
+    public static function deleteImage($image)
+    {
+        if ($image) {
+            Storage::disk('public')->delete($image);
+        }
+    }
 }

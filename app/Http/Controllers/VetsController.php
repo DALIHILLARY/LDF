@@ -175,6 +175,29 @@ class VetsController extends Controller
     {
         // Find the vet by ID
         $vet = Vet::findOrFail($id);
+
+        //delete all iamges and files associated with the vet
+        // Array of properties to check and delete if they exist
+        $propertiesToCheck = [
+            'certificate_of_registration',
+            'license',
+            'other_documents',
+            'profile_picture'
+        ];
+
+        foreach ($propertiesToCheck as $property) {
+            if ($vet->$property) {
+                // If the property is 'other_documents', handle it as a JSON array
+                if ($property === 'other_documents') {
+                    $other_documents = json_decode($vet->other_documents);
+                    foreach ($other_documents as $document) {
+                        Utils::deleteImage($document);
+                    }
+                } else {
+                    Utils::deleteImage($vet->$property);
+                }
+            }
+        }
         
         // Delete the vet
         $vet->delete();
