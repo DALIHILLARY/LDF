@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AdminRoleUser;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Encore\Admin\Auth\Database\Administrator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -34,6 +36,12 @@ class AuthController extends Controller
                 'password' => Hash::make($request->password),
             ]);
 
+            //give the user the role of an administrator
+            $role = new AdminRoleUser();
+            $role->role_id = 2;
+            $role->user_id = $user->id;
+            $role->save();
+
             $token = JWTAuth::fromUser($user);
 
             return response()->json([
@@ -51,7 +59,16 @@ class AuthController extends Controller
                 return response()->json(['error' => 'Unauthorized'], 401);
             }
 
-            return response()->json(['token' => $token]);
+            //get authenticated user 
+            $user_id = auth()->user()->id;
+            $user = Administrator::find($user_id)->with('roles')->first();
+
+           //return the user details, the role and the token
+            return response()->json([
+                'user' => $user,
+                'token' => $token
+            ], 200);
+            
         }
 
 
