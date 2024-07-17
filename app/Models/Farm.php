@@ -38,5 +38,11 @@ class Farm extends Model
         return $this->belongsTo(Farmer::class, 'owner_id');
     }
 
+    //relationship between the farm and the farm animals
+    public function animals()
+    {
+        return $this->hasMany(FarmAnimal::class, 'farm_id');
+    }
+
   
 }

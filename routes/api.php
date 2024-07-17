@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VetsController;
 use App\Http\Controllers\FarmerController;
 use App\Http\Controllers\FarmController;
+use App\Http\Controllers\FarmAnimalController;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,13 +45,18 @@ Route::put('/update-farmers/{id}', [FarmerController::class, 'update']);
 Route::delete('/delete-farmers/{id}', [FarmerController::class, 'destroy']);
 
 //protected routes for authenticated users
-Route::group(['middleware' => ['auth:api']], function () {
+Route::group(['middleware' => ['auth:api']], function () 
+{
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'getAuthenticatedUser']);
+   
+    //farms registration routes
+    Route::resource('/farms', FarmController::class);
     Route::get('/farmers-farms/{id}', [FarmController::class, 'showFarmerFarms']);
 
-    //resource routes
-    Route::resource('/farms', FarmController::class);
+    //farm animals registration routes
+    Route::resource('/animals', FarmAnimalController::class);
+    Route::get('/farm-animals/{id}', [FarmAnimalController::class, 'getFarmAnimalsByFarm']);
 
 });
 

@@ -138,6 +138,11 @@ class FarmController extends Controller
         if ($farm->profile_picture) {
             Utils::deleteImage($farm->profile_picture);
         }
+
+        //delete animals associated with the farm
+
+        $farm->animals()->delete();
+
         $farm->delete();
         return response()->json([
             'message' => 'Farm deleted successfully'
