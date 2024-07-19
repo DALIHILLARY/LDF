@@ -9,8 +9,7 @@ use Encore\Admin\Auth\Database\Administrator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
-use Illuminate\Support\Str;
-use Tymon\JWTAuth\Exceptions\JWTException;
+
 
 
 class AuthController extends Controller

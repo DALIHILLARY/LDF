@@ -9,6 +9,7 @@ use App\Http\Controllers\FarmController;
 use App\Http\Controllers\FarmAnimalController;
 use App\Http\Controllers\HealthRecordController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CartController;
 
 /*
 |--------------------------------------------------------------------------
@@ -73,9 +74,9 @@ Route::group(['middleware' => ['auth:api']], function ()
     Route::get('/categories', [ProductController::class, 'categories']);
 
 
-    // //cart registration routes
-    // Route::post('/cart', [CartController::class, 'store']);
-    // Route::get('/cart', [CartController::class, 'index']);
+    //cart registration routes
+    Route::resource('/cart', CartController::class);
+    
 
     // //order registration routes
     // Route::post('/order', [OrderController::class, 'store']);

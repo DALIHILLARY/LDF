@@ -89,6 +89,8 @@ class FarmController extends Controller
 
     public function update(Request $request, $id)
     {
+
+        
         $rules = [
             'owner_id' => 'required|exists:farmers,id',
             'name' => 'required|string|max:255',
