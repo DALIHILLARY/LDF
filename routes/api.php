@@ -8,6 +8,7 @@ use App\Http\Controllers\FarmerController;
 use App\Http\Controllers\FarmController;
 use App\Http\Controllers\FarmAnimalController;
 use App\Http\Controllers\HealthRecordController;
+use App\Http\Controllers\ProductController;
 
 /*
 |--------------------------------------------------------------------------
@@ -65,6 +66,21 @@ Route::group(['middleware' => ['auth:api']], function ()
     Route::get('/health-records-by-farm/{id}', [HealthRecordController::class, 'showHealthRecordsByFarm']);
     Route::get('/health-records-by-vet/{id}', [HealthRecordController::class, 'showHealthRecordsByVet']);
     Route::get('/health-records-by-date/{date}', [HealthRecordController::class, 'showHealthRecordsByDate']);
+
+    //product registration routes
+    Route::resource('/products', ProductController::class);
+    Route::get('/product/search', [ProductController::class, 'search']);
+    Route::get('/categories', [ProductController::class, 'categories']);
+
+
+    // //cart registration routes
+    // Route::post('/cart', [CartController::class, 'store']);
+    // Route::get('/cart', [CartController::class, 'index']);
+
+    // //order registration routes
+    // Route::post('/order', [OrderController::class, 'store']);
+    // Route::get('/order', [OrderController::class, 'index']);
+
     
 
 });
