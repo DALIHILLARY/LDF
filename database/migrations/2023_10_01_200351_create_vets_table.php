@@ -19,23 +19,21 @@ return new class extends Migration
             $table->string('category')->nullable()->comment('Paravet or Vet');
             $table->string('surname');
             $table->string('given_name');
-            $table->string('nin')->nullable();
-            $table->string('coordinates')->nullable();
-            $table->string('location')->nullable();
-            $table->string('village')->nullable();
-            $table->string('parish')->nullable();
-            $table->string('zone')->nullable();
+            $table->date('date_of_birth');
+            $table->string('gender');
+            $table->string('education');
+            $table->string('marital_status');
             $table->string('group_or_practice')->nullable();
-            $table->string('license_number')->nullable();
-            $table->string('license_expiry_date')->nullable();
-            $table->string('date_of_registration')->nullable();
-            $table->text('brief_profile')->nullable();
+            $table->string('registration_number')->nullable();
+            $table->string('registration_date')->nullable();
+            $table->string('brief_profile')->nullable();
+            $table->string('physical_address')->nullable();
+            $table->string('email')->nullable();
             $table->string('primary_phone_number')->nullable();
             $table->string('secondary_phone_number')->nullable();
-            $table->string('email')->nullable();
             $table->string('postal_address')->nullable();
-            $table->text('services_offered')->nullable();
-            $table->string('ares_of_operation')->nullable();
+            $table->string('services_offered')->nullable();
+            $table->string('areas_of_operation')->nullable();
             $table->string('certificate_of_registration')->nullable();
             $table->string('license')->nullable();
             $table->json('other_documents')->nullable();
@@ -45,7 +43,7 @@ return new class extends Migration
             $table->softDeletes();
 
             $table->foreign('user_id')->references('id')->on('admin_users')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreign('added_by')->references('id')->on('admin_users');
+            $table->foreign('added_by')->references('id')->on('admin_users')->onDelete('set null');
         });
     }
 

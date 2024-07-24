@@ -36,7 +36,7 @@ return new class extends Migration
             $table->softDeletes();
 
             $table->foreign('user_id')->references('id')->on('admin_users')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreign('added_by')->references('id')->on('admin_users');
+            $table->foreign('added_by')->references('id')->on('admin_users')->onDelete('set null');
         });
     }
 

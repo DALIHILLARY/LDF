@@ -19,6 +19,16 @@
             margin-bottom: 20px;
             flex-grow: 1;
         }
+        .image2 {
+            display: block;
+            margin: 0 auto;
+            border-radius: 50%;
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            object-position: center;
+            margin-bottom: 20px;
+        }
         .basic-info {
             flex: 0 1 30%;
             margin-right: 10px;
@@ -29,16 +39,7 @@
         h2 {
             text-align: center;
         }
-        img {
-            display: block;
-            margin: 0 auto;
-            border-radius: 50%;
-            width: 200px;
-            height: 200px;
-            object-fit: cover;
-            object-position: center;
-            margin-bottom: 20px;
-        }
+      
         .details {
             margin-bottom: 10px;
         }
@@ -67,14 +68,12 @@
             <?php
             $profilePicture = $vet->profile_picture ? asset('storage/' . $vet->profile_picture) : asset('storage/images/default_image.png');
             ?>
-            <img src="{{ $profilePicture }}" alt="profile">
+            <img class="image2" src="{{ $profilePicture }}" alt="profile">
     
             <div class="details">
                 <span class="label">Name:</span> {{$vet->title}} . {{$vet->surname}} {{$vet->given_name}}            
             </div>
-            <div class="details">
-                <span class="label">NIN:</span> {{$vet->nin}}
-            </div>
+          
             <div class="details">
                 <span class="label">Phone Number:</span> {{$vet->primary_phone_number}}
             </div>
@@ -87,18 +86,7 @@
             <div class="details">
                 <span class="label">Category:</span> {{$vet->category}}
             </div>
-            <div class="details">
-                <span class="label">District:</span> {{$vet->location}}
-            </div>
-            <div class="details">
-                <span class="label">Village:</span> {{$vet->village}}
-            </div>
-            <div class="details">
-                <span class="label">Parish:</span> {{$vet->parish}}
-            </div>
-            <div class="details">
-                <span class="label">Zone:</span> {{$vet->zone}}
-            </div>
+            
             <div class="details">
                 <span class="label">Postal address:</span> {{$vet->postal_address}}
             </div>
@@ -116,14 +104,13 @@
             </div>
             <h2>Business Credentials</h2>
             <div class="details">
-                <span class="label">Date of registration:</span> {{$vet->date_of_registration}}
+                <span class="label">Date of registration:</span> {{$vet->registration_date}}
             </div>
             <div class="details">
-                <span class="label">License number:</span> {{$vet->license_number}}
+                <span class="label">Registration number:</span> {{$vet->registration_number}}
             </div>
-            <div class="details">
-                <span class="label">License expiry date:</span> {{$vet->license_expiry_date}}
-            </div>
+            
+        
             <h2>Business Documents</h2>
             <div class="details">
         <span class="label">Certificate of registration:</span>

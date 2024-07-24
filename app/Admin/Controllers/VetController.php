@@ -32,7 +32,6 @@ class VetController extends AdminController
 
         $grid->filter(function ($f) {
             $f->disableIdFilter();
-            $f->select('location', 'SubCounty');
             $f->like('category', 'Category');
             $f->like('group_or_practice', 'Group or practice');
             $f->between('created_at', 'Filter by date registered')->date();
@@ -71,8 +70,7 @@ class VetController extends AdminController
         $grid->column('surname', __('Surname'));
         $grid->column('primary_phone_number', __('Primary phone number'));
         $grid->column('email', __('Email'));
-        $grid->column('services_offered', __('Services offered'));
-        $grid->column('ares_of_operation', __('Areas of operation'));
+        $grid->column('areas_of_operation', __('Areas of operation'));
         $grid->column('status', __('Status'))->display(function ($x) {
             if ($x == 'approved') {
                 return "<span class='label label-success'>$x</span>";
@@ -131,24 +129,31 @@ class VetController extends AdminController
         $form->radio('category', __('Category'))->options(['Vet' => 'Vet', 'Paravet' => 'Paravet'])->rules('required')->default('Vet');
         $form->text('surname', __('Surname'))->rules('required');
         $form->text('given_name', __('Given name'))->rules('required');
-        $form->text('nin', __('Nin'))->rules('required');
-       
-        $form->text('coordinates', __('Physical Address '))->required();
-        $form->text('location', __('District SubCounty'));
-        $form->text('village', __('Village'));
-        $form->text('parish', __('Parish'));
-        $form->text('zone', __('Zone'));
+        $form->radio('gender', __('Gender'))->options(['M'=> 'Male', 'F' => 'Female'])->rules('required');
+        $form->date('date_of_birth', __('Date of birth'))->rules('required|before:today');
+        $form->select('education', __('Highest level of education'))
+        ->options([
+            'None' => 'None',
+            'Primary' => 'Primary',
+            'Secondary' => 'Secondary',
+            'Tertiary' => 'Tertiary',
+            'Bachelor' => 'Bachelor',
+            'Masters' => 'Masters',
+            'PhD' => 'PhD',
+            'Diploma' => 'Diploma',
+        ]);
+        $form->radio('marital_status', __('Marital status'))->options(['S'=> 'Single', 'M' => 'Married', 'D' => 'Divorced', 'W' => 'Widowed']);
         $form->text('group_or_practice', __('Group or practice'))->rules('required');
-        $form->text('license_number', __('License number'))->rules('required');
-        $form->date('license_expiry_date', __('License expiry date'))->rules('required');
-        $form->date('date_of_registration', __('Date of registration'))->rules('required');
+        $form->text('registration_number', __('Registration number'))->rules('required');
+        $form->date('registration_date', __('Registration date'))->rules('required');
         $form->textarea('brief_profile', __('Brief profile'));
+        $form->text('physical_address', __('Physical address'))->rules('required');
+        $form->email('email', __('Email'))->rules('unique:vets,email')->rules('required');
         $form->text('primary_phone_number', __('Primary phone number'))->rules('required');
         $form->text('secondary_phone_number', __('Alternative phone number'));
-        $form->email('email', __('Email'))->rules('unique:vets,email')->rules('required');
         $form->text('postal_address', __('Postal address'));
         $form->textarea('services_offered', __('Services offered'))->rules('required');
-        $form->text('ares_of_operation', __('Areas of operation'))->rules('required');
+        $form->text('areas_of_operation', __('Areas of operation'))->rules('required');
         $form->file('certificate_of_registration', __('Certificate of registration'))->rules('required');
         $form->file('license', __('License'))->rules('required');
         $form->multipleFile('other_documents', __('Other documents'));
