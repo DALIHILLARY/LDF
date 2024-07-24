@@ -37,7 +37,7 @@ class VetsController extends Controller
             'registration_date' => 'required|date',
             'brief_profile' => 'nullable|string',
             'physical_address' => 'required|string',
-            'primary_phone_number' => 'required|string|max:15',
+            'primary_phone_number' => 'required|string|max:15|unique:vets,primary_phone_number',
             'secondary_phone_number' => 'nullable|string|max:15',
             'email' => 'required|email|unique:vets,email',
             'postal_address' => 'nullable|string|max:255',
