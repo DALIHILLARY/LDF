@@ -8,8 +8,8 @@ use App\Models\Farmer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Support\Facades\Storage;
 use App\Models\Utils;
+use App\Models\User;
 
 class FarmerController extends Controller
 {
@@ -33,23 +33,17 @@ class FarmerController extends Controller
             'given_name' => 'required|string',
             'date_of_birth' => 'required|date|before_or_equal:today',
             'nin' => 'required|string',
-            'location' => 'nullable|string',
-            'village' => 'required|string',
-            'parish' => 'required|string',
-            'zone' => 'required|string',
+            'physical_address' => 'nullable|string',
             'gender' => 'required|in:M,F',
-            'marital_status' => 'required|in:S,M,D,W',
-            'number_of_dependants' => 'required|numeric',
-            'farmer_group' => 'required|string',
+            'marital_status' => 'nullable|in:S,M,D,W',
+            'cooperative_association' => 'nullable|string',
             'primary_phone_number' => 'required|string|unique:farmers,primary_phone_number',
             'secondary_phone_number' => 'nullable|string',
-            'is_land_owner' => 'required|boolean',
-            'land_ownership' => 'required_if:is_land_owner,1|string',
+            'is_land_owner' => 'nullable|boolean',
             'production_scale' => 'required|string',
-            'access_to_credit' => 'required|boolean',
-            'credit_institution' => 'required_if:access_to_credit,1|string',
-            'date_started_farming' => 'required|date_format:Y',
-            'highest_level_of_education' => 'required|string',
+            'access_to_credit' => 'nullable|boolean',
+            'farming_experience' => 'required|date_format:Y',
+            'education' => 'nullable|string',
             'profile_picture' => 'nullable|string',
             
         ];
@@ -68,6 +62,16 @@ class FarmerController extends Controller
         // For example, handle profile_picture if present
         if ($request->has('profile_picture')) {
             $validatedData['profile_picture'] = Utils::storeBase64Image($request->input('profile_picture'), 'images');
+        }
+
+        $user = User::where('email', $validatedData['primary_phone_number']) 
+        ->orWhere('username', $validatedData['primary_phone_number'])
+        ->first();
+
+        if($user){
+            return response()->json([
+                'message' => 'User with the same primary phone number already exists'
+            ], 422);
         }
     
         // Save the validated data to the database
@@ -89,26 +93,21 @@ class FarmerController extends Controller
             'given_name' => 'required|string',
             'date_of_birth' => 'required|date|before_or_equal:today',
             'nin' => 'required|string',
-            'location' => 'nullable|string',
-            'village' => 'required|string',
-            'parish' => 'required|string',
-            'zone' => 'required|string',
+            'physical_address' => 'nullable|string',
             'gender' => 'required|in:M,F',
-            'marital_status' => 'required|in:S,M,D,W',
-            'number_of_dependants' => 'required|numeric',
-            'farmer_group' => 'required|string',
-            'primary_phone_number' => 'required|string|unique:farmers,primary_phone_number,' . $id,
+            'marital_status' => 'nullable|in:S,M,D,W',
+            'cooperative_association' => 'nullable|string',
+            'primary_phone_number' => 'required|string|unique:farmers,primary_phone_number',
             'secondary_phone_number' => 'nullable|string',
-            'is_land_owner' => 'required|boolean',
-            'land_ownership' => 'required_if:is_land_owner,1|string',
+            'is_land_owner' => 'nullable|boolean',
             'production_scale' => 'required|string',
-            'access_to_credit' => 'required|boolean',
-            'credit_institution' => 'required_if:access_to_credit,1|string',
-            'date_started_farming' => 'required|date_format:Y',
-            'highest_level_of_education' => 'required|string',
+            'access_to_credit' => 'nullable|boolean',
+            'farming_experience' => 'required|date_format:Y',
+            'education' => 'nullable|string',
             'profile_picture' => 'nullable|string',
-          
+            
         ];
+    
     
         try {
             // Validate the incoming request data
@@ -120,9 +119,17 @@ class FarmerController extends Controller
             ], 422);
         }
     
-        // Handle additional logic here, such as storing images, etc.
+        $user = User::where('email', $validatedData['primary_phone_number']) 
+        ->orWhere('username', $validatedData['primary_phone_number'])
+        ->first();
+
+        if($user){
+            return response()->json([
+                'message' => 'User with the same primary phone number already exists'
+            ], 422);
+        }
     
-        // For example, handle profile_picture if present
+        // handle profile_picture if present
         if ($request->has('profile_picture')) {
             $validatedData['profile_picture'] = Utils::storeBase64Image($request->input('profile_picture'), 'images');
         }

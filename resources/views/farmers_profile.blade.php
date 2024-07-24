@@ -1,9 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Farmer's Information</title>
+
     <style>
         .container {
             display: flex;
@@ -19,17 +14,17 @@
             margin-bottom: 20px;
             flex-grow: 1;
         }
-        .basic-info {
+       .basic-info {
             flex: 0 1 30%;
             margin-right: 10px;
         }
         .additional-info {
             margin-left: 10px;
         }
-        h2 {
+          h2 {
             text-align: center;
         }
-        img {
+        .image2 {
             display: block;
             margin: 0 auto;
             border-radius: 50%;
@@ -39,14 +34,14 @@
             object-position: center;
             margin-bottom: 20px;
         }
-        .details {
+         .details {
             margin-bottom: 10px;
         }
-        .label {
+      .label {
             font-weight: bold;
             color: black;
         }
-        .back-arrow {
+         .back-arrow {
             margin-bottom: 5px;
             cursor: pointer;
             font-size: 24px;
@@ -54,10 +49,9 @@
         }
         .back-arrow:hover {
             color: orange; /* Color on hover */
-        }
+        } */
     </style>
-</head>
-<body>
+
     <div class="container">
         
         <div class="card basic-info">
@@ -67,7 +61,7 @@
             <?php
             $profile_picture = $farmer->profile_picture ? asset('storage/' . $farmer->profile_picture) : asset('storage/images/default_image.png');
             ?>
-            <img src="{{ $profile_picture }}" alt="profile_picture">
+            <img class ="image2"src="{{ $profile_picture }}" alt="profile_picture">
     
             <div class="details">
                 <span class="label">Name:</span> {{$farmer->surname}} {{$farmer->given_name}}          
@@ -97,13 +91,10 @@
                 <span class="label">NIN:</span> {{$farmer->nin}}
             </div>
             <div class="details">
-                <span class="label">Level of education:</span> {{$farmer->highest_level_of_education}}
+                <span class="label">Level of education:</span> {{$farmer->education}}
             </div>
             <div class="details">
-                <span class="label">Number of dependants:</span> {{$farmer->number_of_dependants}}
-            </div>
-            <div class="details">
-                <span class="label">Farmer group:</span> {{$farmer->farmer_group}}
+                <span class="label">Cooperative/Association:</span> {{$farmer->cooperative_association}}
             </div>
             <div class="details">
                 <span class="label">Is Land Owner:</span> 
@@ -124,17 +115,7 @@
         <div class="card additional-info">
             <h2>Farm Details</h2>
             <div class="details">
-                <span class="label">SubCounty:</span> {{$farmer->location}}
-            </div>
-
-            <div class="details">
-                <span class="label">Village:</span> {{$farmer->village}}
-            </div>
-            <div class="details">
-                <span class="label">Parish:</span> {{$farmer->parish}}
-            </div>
-            <div class="details">
-                <span class="label">Zone:</span> {{$farmer->zone}}
+                <span class="label">Physical address:</span> {{$farmer->physical_address}}
             </div>
         
             <div class="details">
@@ -142,11 +123,10 @@
             </div>
             
             <div class="details">
-                <span class="label">Started farming in:</span> {{$farmer->date_started_farming}}
+                <span class="label">Started farming in:</span> {{$farmer->farming_experience}}
             </div>
 
         </div>
     
    
-</body>
-</html>
+

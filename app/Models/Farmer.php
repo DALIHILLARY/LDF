@@ -11,34 +11,26 @@ class Farmer extends Model
     use HasFactory;
     use SoftDeletes;
 
-    protected $fillable=[
+    protected $fillable = [
         'profile_picture',
         'surname',
         'given_name',
+        'gender',
         'date_of_birth',
         'nin',
-        'location_id',
-        'village',
-        'parish',
-        'zone',
-        'gender',
         'marital_status',
-        'number_of_dependants',
-        'farmer_group',
         'primary_phone_number',
         'secondary_phone_number',
+        'physical_address',
+        'cooperative_association',
         'is_land_owner',
-        'land_ownership',
         'production_scale',
         'access_to_credit',
-        'credit_institution',
-        'date_started_farming',
-        'highest_level_of_education',
-        'admin_remarks',
+        'farming_experience',
+        'education',
         'status',
         'user_id',
         'added_by',
-        
 
     ];
 
@@ -58,6 +50,7 @@ class Farmer extends Model
                 $user = User::where('email', $model->primary_phone_number) 
                 ->orWhere('username', $model->primary_phone_number)
                 ->first();
+            
                 if(!$user){
                    //create a new user and assign the user_id to the vet
                     $new_user = new User();
@@ -68,7 +61,7 @@ class Farmer extends Model
                     $new_user->avatar = $model->profile_picture ? $model->profile_picture : 'images/default_image.png';
                     $new_user->save();
 
-                    
+                    error_log('here');
                     $model->user_id = $new_user->id;
                 }
                
@@ -95,7 +88,7 @@ class Farmer extends Model
           });
 
 
-           //callback to create a user with the vet credentials after if the status is approved 
+        
            self::updating(function ($model){
                
             });

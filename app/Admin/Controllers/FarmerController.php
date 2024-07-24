@@ -68,7 +68,7 @@ class FarmerController extends AdminController
         
         $grid->column('surname', __('Surname'));
         $grid->column('given_name', __('Given name'));
-        $grid->column('location', __('Location'));
+        $grid->column('physical_address', __('Physical address'));
         $grid->column('marital_status', __('Marital status'))->display(function ($marital_status) {
             switch ($marital_status) {
                 case 'S':
@@ -119,7 +119,7 @@ class FarmerController extends AdminController
     {
         $form = new Form(new Farmer());
         if($form->isCreating()){
-            $form->hidden('status')->default('Pending');
+            $form->hidden('status')->default('active');
            
         }
         $form->tools(function (Form\Tools $tools) {
@@ -130,42 +130,25 @@ class FarmerController extends AdminController
 
         $form->text('surname', __('Surname'))->rules('required');
         $form->text('given_name', __('Given name'))->rules('required');
+        $form->radio('gender', __('Gender'))->options(['M'=> 'Male', 'F' => 'Female'])->rules('required');
         $form->date('date_of_birth', __('Date of birth'))->rules('required|before:today');
         $form->text('nin', __('Nin'))->rules('required');
-        $form->text('location', __('SubCounty'));
-        $form->text('village', __('Village'))->rules('required');
-        $form->text('parish', __('Parish'))->rules('required');
-        $form->text('zone', __('Zone'))->rules('required');
-        $form->radio('gender', __('Gender'))->options(['M'=> 'Male', 'F' => 'Female'])->rules('required');
-        $form->radio('marital_status', __('Marital status'))->options(['S'=> 'Single', 'M' => 'Married', 'D' => 'Divorced', 'W' => 'Widowed'])->rules('required');
-        $form->text('number_of_dependants', __('Number of dependants'))->rules('required|numeric');
-        $form->text('farmer_group', __('Farmer group'))->rules('required');
+        $form->radio('marital_status', __('Marital status'))->options(['S'=> 'Single', 'M' => 'Married', 'D' => 'Divorced', 'W' => 'Widowed']);
         $form->text('primary_phone_number', __('Phone number'))->rules('required');
         $form->text('secondary_phone_number', __('Other phone number'));
-        $form->radio('is_land_owner', __('Do you own land ?'))->options([1=> 'Yes', 0 => 'No'])
-            ->when(1, function (Form $form) {
-                $form->select('land_ownership', __('Land ownership'))->options([
-                    'Lease' => 'Lease',
-                    'Rent' => 'Rent',
-                    'Own' => 'Own',
-                    'Other' => 'Other'
-                ]);
-            })
-            ->rules('required');
+        $form->text('physical_address', __('Physical address'))->rules('required');
+        $form->text('cooperative_association', __('Cooperative/Association'));
+        $form->radio('is_land_owner', __('Do you own land ?'))->options([true => 'Yes', false => 'No']);
         $form->select('production_scale', __('Production Type'))->options([
             'Small scale' => 'Small scale',
             'Medium scale' => 'Medium scale',
             'Large scale' => 'Large scale',
             'Commercial scale' => 'Commercial scale',
             'Other' => 'Other'
-        ]);
-        $form->radio('access_to_credit', __('Have you ever gotten credit?'))->options(['1'=> 'Yes', '0' => 'No'])
-            ->when(1, function (Form $form) {
-                $form->text('credit_institution', __('Credit institution'))->rules('required');
-            })
-        ->rules('required');
-        $form->date('date_started_farming', __('Which year did you start farming?'))->default(date('Y'))->format('YYYY')->rules('required');
-        $form->select('highest_level_of_education', __('Highest level of education'))
+        ])->rules('required');
+        $form->radio('access_to_credit', __('Have you ever gotten credit?'))->options([true=> 'Yes', false => 'No']);  
+        $form->date('farming_experience', __('Which year did you start farming?'))->default(date('Y'))->format('YYYY')->rules('required');
+        $form->select('education', __('Highest level of education'))
             ->options([
                 'None' => 'None',
                 'Primary' => 'Primary',
@@ -174,7 +157,8 @@ class FarmerController extends AdminController
                 'Bachelor' => 'Bachelor',
                 'Masters' => 'Masters',
                 'PhD' => 'PhD',
-            ])->rules('required');
+                'Diploma' => 'Diploma',
+            ]);
             
         $form->image('profile_picture', __('Profile picture'));
         $form->hidden('added_by')->default(Admin::user()->id);
