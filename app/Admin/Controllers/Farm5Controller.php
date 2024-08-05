@@ -7,6 +7,7 @@ use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use Carbon\Carbon;
 use Encore\Admin\Facades\Admin;
 
 class FarmController extends AdminController
@@ -30,17 +31,31 @@ class FarmController extends AdminController
         $grid->filter(function ($f) {
             $f->disableIdFilter();
             $f->like('name', 'Farm name');
+            $f->like('location', 'SubCounty');
+            $f->like('production_type', 'Farm type');
             $f->between('created_at', 'Filter by date registered')->date();
         });
 
+        if(Admin::user()->isRole('ldf_admin') || Admin::user()->isRole('administrator')) {
+            $grid->model()->latest();
+        }else {
+            $grid->model()->where('owner_id', Admin::user()->id)->latest();
+        }
+
+        $grid->column('created_at', __('Registered On'))->display(function ($x) {
+            $c = Carbon::parse($x);
+        if ($x == null) {
+            return $x;
+        }
+        return $c->format('d M, Y');
+        });
+
         $grid->column('name', __('Name'));
+        $grid->column('location', __('SubCounty'));
+        $grid->column('production_type', __('Farm type'));
         $grid->column('date_of_establishment', __('Date of establishment'));
-        $grid->column('size', __('Size'));
-        $grid->column('number_of_animals', __('Number of animals'));
-        $grid->column('owner_id', __('Owner id'));
-        $grid->column('added_by', __('Added by'));
-        $grid->column('created_at', __('Created at'));
-    
+        $grid->column('breeds', __('Breeds'));
+        
 
         return $grid;
     }
@@ -74,7 +89,8 @@ class FarmController extends AdminController
             return [$farmer->id => $farmer->surname . ' ' . $farmer->given_name];
         }))
         ->rules('required');
-        $form->text('name', __('Name'));
+    
+        $form->text('name', __('Farm name'))->rules('required');
          //  //add a get gps coordinate button
          $form->html('<button type="button" id="getLocationButton">' . __('Get GPS Coordinates') . '</button>');
 
@@ -95,37 +111,14 @@ class FarmController extends AdminController
                  }
              });
          SCRIPT);
-
-        $form->multipleSelect('livestock_type', __('Livestock type'))->options([
-            'cattle' => 'Cattle',
-            'sheep' => 'Sheep',
-            'goats' => 'Goats',
-            'poultry' => 'Poultry',
-            'pigs' => 'Pigs',
-            'rabbits' => 'Rabbits',
-            'camel' => 'Camels',
-            'others' => 'Others',
-        ])->required();
-        $form->multipleSelect('production_type', __('Production type'))->options([
-            'milk' => 'Milk',
-            'eggs' => 'Eggs',
-            'meat' => 'Meat',
-            'honey' => 'Honey',
-            'wool' => 'Wool',
-            'others' => 'Others',
-        ])->required();
-        $form->text('date_of_establishment', __('Date of establishment'))->required();
-        $form->text('size', __('Land Size in acres'))->required();
-        $form->number('number_of_animals', __('Number of animals'));
-        $form->multipleSelect('farm_structures', __('Farm structures'))->options([
-            'barn' => 'Barn',
-            'silo' => 'Silo',
-            'pen' => 'Pen',
-            'chicken coop' => 'Chicken coop',
-            'others' => 'Others',
-        ])->required();
-        $form->textarea('general_remarks', __('General remarks'));
-        $form->file('profile_picture', __('Farm image'))->rules('mimes:jpeg,bmp,png');
+        $form->text('location', __('SubCounty'))->rules('required');
+        $form->text('breeds', __('Enter Breeds'));
+        $form->text('production_type', __('Farm Type'))->rules('required')->help('e.g. Dairy, Beef, Eggs, etc.');
+        $form->date('date_of_establishment', __('Date of establishment'))->default(date('Y-m-d'))->format('YYYY')->rules('required');
+        $form->text('size', __('Land Size in acres'))->rules('required')->help('e.g. 10 acres, 20 acres, etc.');
+        $form->number('number_of_animals', __('Animal density'))->rules('required')->help('e.g. 100 cows, 200 chickens, etc.');
+        $form->text('farm_structures', __('Farm structures'))->help('e.g. Cowshed, chicken coop, etc.');
+        $form->image('profile_picture', __('Farm image'));
         $form->hidden('added_by')->value(Admin::user()->id);
 
         return $form;

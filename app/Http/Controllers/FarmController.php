@@ -36,32 +36,25 @@ class FarmController extends Controller
         
         return response()->json($farms);
     }
-
-
-
-
+   
     public function store(Request $request)
     {
         $rules= [
             'owner_id' => 'required|exists:farmers,id',
             'name' => 'required|string|max:255',
             'coordinates' => 'required|string|max:255',
-            'location' => 'required|string|max:255',
-            'village' => 'nullable|string|max:255',
-            'parish' => 'nullable|string|max:255',
-            'zone' => 'nullable|string|max:255',
-            'breeds' => 'nullable|string|max:255',
-            'production_type' => 'required|string|max:255',
+            'livestock_type' => 'nullable|array',
+            'livestock_type.*' => 'string|max:255',
+            'farm_structures' => 'nullable|array',
+            'farm_structures.*' => 'string|max:255',
+            'production_type' => 'required|array',
+            'production_type.*' => 'string|max:255',
             'date_of_establishment' => 'required|date',
             'size' => 'required|string|max:255',
-            'number_of_workers' => 'nullable|integer',
-            'land_ownership' => 'required|string',
-            'no_land_ownership_reason' => 'nullable|string',
+            'number_of_animals' => 'nullable|integer',
             'profile_picture' => 'nullable|string',
-           
         ];
 
-        
         try {
             // Validate the incoming request data
             $validatedData = Validator::make($request->all(), $rules)->validate();
@@ -72,15 +65,18 @@ class FarmController extends Controller
             ], 422);
         }
 
-        
         // For example, handle profile_picture if present
         if ($request->has('profile_picture')) {
             $validatedData['profile_picture'] = Utils::storeBase64Image($request->input('profile_picture'), 'images');
         }
-    
+
+        // Convert array fields to JSON for storage
+        $validatedData['livestock_type'] = $request->input('livestock_type') ? json_encode($request->input('livestock_type')) : null;
+        $validatedData['farm_structures'] = $request->input('farm_structures') ? json_encode($request->input('farm_structures')) : null;
+        $validatedData['production_type'] = $request->input('production_type') ? json_encode($request->input('production_type')) : null;
 
         $farm = Farm::create($validatedData);
-    
+
         return response()->json([
             'message' => 'Farm added successfully',
             'farm' => $farm
@@ -89,27 +85,22 @@ class FarmController extends Controller
 
     public function update(Request $request, $id)
     {
-
-        
         $rules = [
             'owner_id' => 'required|exists:farmers,id',
             'name' => 'required|string|max:255',
             'coordinates' => 'required|string|max:255',
-            'location' => 'required|string|max:255',
-            'village' => 'nullable|string|max:255',
-            'parish' => 'nullable|string|max:255',
-            'zone' => 'nullable|string|max:255',
-            'breeds' => 'nullable|string|max:255',
-            'production_type' => 'required|string|max:255',
+            'livestock_type' => 'nullable|array',
+            'livestock_type.*' => 'string|max:255',
+            'farm_structures' => 'nullable|array',
+            'farm_structures.*' => 'string|max:255',
+            'production_type' => 'required|array',
+            'production_type.*' => 'string|max:255',
             'date_of_establishment' => 'required|date',
             'size' => 'required|string|max:255',
-            'number_of_workers' => 'nullable|integer',
-            'land_ownership' => 'required|string',
-            'no_land_ownership_reason' => 'nullable|string',
+            'number_of_animals' => 'nullable|integer',
             'profile_picture' => 'nullable|string',
-         
         ];
-
+    
         try {
             // Validate the incoming request data
             $validatedData = Validator::make($request->all(), $rules)->validate();
@@ -119,14 +110,23 @@ class FarmController extends Controller
                 'errors' => $e->errors()
             ], 422);
         }
-
+    
+        // Find the existing farm record
+        $farm = Farm::findOrFail($id);
+    
+        // For example, handle profile_picture if present
         if ($request->has('profile_picture')) {
             $validatedData['profile_picture'] = Utils::storeBase64Image($request->input('profile_picture'), 'images');
         }
-
-        $farm = Farm::find($id);
+    
+        // Convert array fields to JSON for storage
+        $validatedData['livestock_type'] = $request->input('livestock_type') ? json_encode($request->input('livestock_type')) : null;
+        $validatedData['farm_structures'] = $request->input('farm_structures') ? json_encode($request->input('farm_structures')) : null;
+        $validatedData['production_type'] = $request->input('production_type') ? json_encode($request->input('production_type')) : null;
+    
+        // Update the farm record
         $farm->update($validatedData);
-
+    
         return response()->json([
             'message' => 'Farm updated successfully',
             'farm' => $farm

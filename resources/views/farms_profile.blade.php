@@ -65,7 +65,8 @@
             <h2>Basic Farm Information</h2>
            
             <?php
-            $profilePicture = $farm->profile_picture ? asset('storage/' . $farm->profile_picture) : asset('storage/images/farm2.jpeg');
+            error_log($farm->profile_picture);
+            $profilePicture = $farm->profile_picture ? asset('storage/' . $farm->profile_picture) : asset('storage/images/farm.jpeg');
             ?>
             <img src="{{ $profilePicture }}" alt="profile">
     
@@ -80,32 +81,28 @@
         <div class="card additional-info">
             <h2>Farm Details</h2>
             <div class="details">
-                <span class="label">Subcounty:</span> {{$farm->location}}
-            </div>
+             
+             <span class="label">Farm type:</span> {{ implode(', ', $farm->livestock_type) }}
+             </div>
+
             <div class="details">
-                <span class="label">Village:</span> {{$farm->village}}
-            </div>
-            <div class="details">
-                <span class="label">Parish:</span> {{$farm->parish}}
-            </div>
-            <div class="details">
-                <span class="label">Zone:</span> {{$farm->zone}}
-            </div>
-            <div class="details">
-                <span class="label">Farm type:</span> {{$farm->production_type}}
-            </div>
+             
+             <span class="label">Farm type:</span> {{ implode(', ', $farm->production_type) }}
+             </div>
             <div class="details">
                 <span class="label">Date of establishment:</span> {{$farm->date_of_establishment}}
             </div>
             <div class="details">
                 <span class="label">Land size:</span> {{$farm->size}}
             </div>
+
             <div class="details">
-                <span class="label">Number of workers:</span> {{$farm->number_of_workers}}
+                <span class="label">Number of animals:</span> {{$farm->number_of_animals}}
             </div>
             <div class="details">
-                <span class="label">Land ownership:</span> {{$farm->land_ownership}}
-            </div>
+             
+             <span class="label">Farm structures:</span> {{ implode(', ', $farm->farm_structures) }}
+             </div>
 
         </div>
     </div>

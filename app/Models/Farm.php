@@ -14,23 +14,23 @@ class Farm extends Model
     protected $fillable = [
         'name',
         'coordinates',
-        'breeds',
-        'location',
-        'village',
-        'parish',
-        'zone',
         'livestock_type',
         'production_type',
         'date_of_establishment',
         'size',
         'profile_picture',
-        'number_of_workers',
-        'land_ownership',
-        'no_land_ownership_reason',
+        'number_of_animals',
+        'farm_structures',
         'general_remarks',
         'owner_id',
         'added_by'
 
+    ];
+
+    protected $casts = [
+        'livestock_type' => 'array',
+        'production_type' => 'array',
+        'farm_structures' => 'array'
     ];
 
     public function farmOwner()
