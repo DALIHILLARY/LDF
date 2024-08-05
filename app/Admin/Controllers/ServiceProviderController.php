@@ -69,7 +69,7 @@ class ServiceProviderController extends AdminController
 
         $grid->column('logo', __('Logo'))->image('', 50, 50);
         $grid->column('name', __('Name'));
-        $grid->column('class_of_service', __('Class of service'));
+        $grid->column('provider_type', __('Provider type'));
         $grid->column('physical_address', __('Physical address'));
         $grid->column('primary_phone_number', __('Primary phone number'));
         $grid->column('email', __('Email'));
@@ -112,11 +112,38 @@ class ServiceProviderController extends AdminController
            
         });
 
-
+        $form->radio('provider_category', __('Provider category'))->options
+        (['services' => 'Services', 'products' => 'Products','drugs'=>'Drugs'])->rules('required')
+        ->when('services', function (Form $form) {
+            $form->select('provider_type', __('Provider type'))->options([
+                'Veterinary' => 'Veterinary clinic',
+                'Breeding Services' => 'Breeding services',
+                'Artificial Insemination' => 'Artificial insemination',
+                'Vaccination' => 'Vaccination',
+                'Live_stock Transportation' => 'Live stock transportation',
+                'Livestock Insurance' => 'Livestock insurance',
+                'Diagnostic Laboratory' => 'Diagnostic Laboratory',
+                'Training Centre' => 'Training Centre'
+            ])->rules('required');
+        })->when('products', function (Form $form) {
+            $form->select('provider_type', __('Provider type'))->options([
+                'Feed Supplier' => 'Feed supplier',
+                'livestock Equipment' => 'Livestock equipment',
+                'Farm Input Supplier' => 'Farm input supplier',
+            ])->rules('required');
+        })->when('drugs', function (Form $form) {
+            $form->select('provider_type', __('Provider type'))->options([
+                'Drug Shop' => 'Drug shop',
+              
+            ])->rules('required');
+           
+        });
         $form->text('name', __('Name'))->rules('required');
         $form->text('owner_name', __('Owner name'))->rules('required');
         $form->textarea('owner_profile', __('Owner profile'))->rules('required');
-        $form->textarea('class_of_service', __('Class of service'))->rules('required');
+        $form->text('ursb_incorporation_number', __('Ursb incorporation number'))->rules('required');
+        $form->date('date_of_incorporation', __('Date of incorporation'))->rules('required|before_or_equal:today');
+        $form->text('type_of_shop', __('Type of shop(Agro/Vet)'))->rules('required');
         $form->date('date_of_registration', __('Date of registration'))->rules('required|before_or_equal:today');
         $form->text('physical_address', __('Physical address'))->rules('required');
         $form->text('primary_phone_number', __('Primary phone number'))->rules('required');

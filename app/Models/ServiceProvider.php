@@ -12,10 +12,15 @@ class ServiceProvider extends Model
     use SoftDeletes;
     
     protected $fillable=[
+        'provider_category',
+        'provider_type',
         'name',
         'owner_name',
         'owner_profile',
-        'class_of_service',
+        'ursb_incorporation_number',
+        'date_of_incorporation',
+        'type_of_shop',
+        
         'date_of_registration',
         'physical_address',
         'primary_phone_number',

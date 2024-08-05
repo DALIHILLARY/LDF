@@ -25,10 +25,14 @@ class ServiceProviderController extends Controller
     {
          // Define validation rules
     $rules = [
+        'provider_category' => 'required|string',
+        'provider_type' => 'required|string',
         'name' => 'required|string|max:255',
         'owner_name' => 'required|string|max:255',
         'owner_profile' => 'required|string',
-        'class_of_service' => 'required|string',
+        'ursb_incorporation_number' => 'required|string|max:255',
+        'date_of_incorporation' => 'required|date|before_or_equal:today',
+        'type_of_shop' => 'required|string',
         'date_of_registration' => 'required|date|before_or_equal:today',
         'physical_address' => 'required|string|max:255',
         'primary_phone_number' => 'required|string|max:15',
@@ -79,10 +83,14 @@ class ServiceProviderController extends Controller
         // Validate the incoming request data
         // Define validation rules
     $rules = [
+        'provider_category' => 'required|string',
+        'provider_type' => 'required|string',
         'name' => 'required|string|max:255',
         'owner_name' => 'required|string|max:255',
         'owner_profile' => 'required|string',
-        'class_of_service' => 'required|string',
+        'ursb_incorporation_number' => 'required|string|max:255',
+        'date_of_incorporation' => 'required|date|before_or_equal:today',
+        'type_of_shop' => 'required|string',
         'date_of_registration' => 'required|date|before_or_equal:today',
         'physical_address' => 'required|string|max:255',
         'primary_phone_number' => 'required|string|max:15',

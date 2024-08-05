@@ -12,14 +12,20 @@ class VetsController extends Controller
 {
     public function index()
     {
-        return Vet::all();
+        // Get all vets with available times
+        $vets = Vet::with('availableTimes')->get();
+
+        return response()->json([
+            'vets' => $vets
+        ], 200);
     }
 
     public function show($id)
     {
-        $vet = Vet::find($id);
+        $vet = Vet::with('availableTimes')->findOrFail($id);
         return response()->json($vet);
     }
+
     public function store(Request $request)
     {
         // Validation rules
@@ -48,6 +54,10 @@ class VetsController extends Controller
             'other_documents' => 'nullable|array',
             'other_documents.*' => 'string',
             'profile_picture' => 'nullable|string',
+            'available_times' => 'required|array',
+            'available_times.*.day' => 'required|string',
+            'available_times.*.start_time' => 'required|date_format:H:i',
+            'available_times.*.end_time' => 'required|date_format:H:i',
         ];
     
         // Validate the incoming request data
@@ -83,6 +93,16 @@ class VetsController extends Controller
     
         // Save the validated data to the database
         $vet = Vet::create($validatedData);
+
+            // Save available times
+        if ($request->has('available_times')) {
+            foreach ($request->input('available_times') as $time) {
+                $vet->availableTimes()->create($time);
+            }
+        }
+
+          // Load the available times relationship
+         $vet->load('availableTimes');
     
         return response()->json([
             'message' => 'Vet added successfully',
@@ -118,17 +138,22 @@ class VetsController extends Controller
         'other_documents' => 'nullable|array',
         'other_documents.*' => 'string',
         'profile_picture' => 'nullable|string',
-    ];
+        'available_times' => 'required|array',
+        'available_times.*.id' => 'nullable|integer',
+        'available_times.*.day' => 'required|string',
+        'available_times.*.start_time' => 'required|date_format:H:i',
+        'available_times.*.end_time' => 'required|date_format:H:i',
+        ];
 
-    // Validate the incoming request data
-    try {
-        $validatedData = Validator::make($request->all(), $rules)->validate();
-    } catch (ValidationException $e) {
-        return response()->json([
-            'message' => 'Validation failed',
-            'errors' => $e->errors()
-        ], 422);
-    }
+        // Validate the incoming request data
+        try {
+            $validatedData = Validator::make($request->all(), $rules)->validate();
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        }
 
 
         // Find the vet by ID
@@ -159,13 +184,21 @@ class VetsController extends Controller
         // Update the vet with the validated data
         $vet->update($validatedData);
 
-        return response()->json([
-            'message' => 'Vet updated successfully',
-            'vet' => $vet
-        ], 200);
-        
-    }
+        // Update available times
+        $vet->availableTimes()->delete(); // Delete existing times
+        foreach ($request->input('available_times') as $time) {
+            $vet->availableTimes()->create($time); // Create new times
+        }
 
+        // Load the available times relationship
+        $vet->load('availableTimes');
+
+            return response()->json([
+                'message' => 'Vet updated successfully',
+                'vet' => $vet
+            ], 200);
+            
+    }
 
     public function destroy($id)
     {
@@ -194,6 +227,9 @@ class VetsController extends Controller
                 }
             }
         }
+
+         // Delete associated available times
+         $vet->availableTimes()->delete();
         
         // Delete the vet
         $vet->delete();

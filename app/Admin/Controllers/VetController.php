@@ -154,6 +154,23 @@ class VetController extends AdminController
         $form->text('postal_address', __('Postal address'));
         $form->textarea('services_offered', __('Services offered'))->rules('required');
         $form->text('areas_of_operation', __('Areas of operation'))->rules('required');
+
+        //add available times
+        $form->hasMany('availableTimes', 'Available times', function (Form\NestedForm $form) {
+            $form->select('day', 'Day')->options([
+                'Monday' => 'Monday',
+                'Tuesday' => 'Tuesday',
+                'Wednesday' => 'Wednesday',
+                'Thursday' => 'Thursday',
+                'Friday' => 'Friday',
+                'Saturday' => 'Saturday',
+                'Sunday' => 'Sunday',
+            ])->rules('required');
+            $form->time('start_time', 'Start time')->rules('required');
+            $form->time('end_time', 'End time')->rules('required');
+         
+        });
+
         $form->file('certificate_of_registration', __('Certificate of registration'))->rules('required');
         $form->file('license', __('License'))->rules('required');
         $form->multipleFile('other_documents', __('Other documents'));

@@ -155,4 +155,10 @@ class Vet extends Model
     {
         return $this->ratings()->avg('rating');
     }
+
+    
+    public function availableTimes()
+    {
+        return $this->hasMany(AvailableTime::class);
+    }
 }
