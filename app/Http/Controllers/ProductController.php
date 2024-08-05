@@ -15,11 +15,19 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $rules =[
-            'provider_id' => 'required|exists:service_providers,id',
+            'provider_id' => 'nullable|exists:service_providers,id',
+            'farmer_id' => 'nullable|exists:farmers,id',
             'name' => 'required|string',
             'description' => 'required|string',
+            'manufacturer' => 'required|string',
             'price' => 'required|numeric',
-            'image' => 'nullable|string',
+            'quantity_available' => 'required|integer',
+            'expiry_date' => 'nullable|date',
+            'storage_conditions' => 'nullable|string',
+            'usage_instructions' => 'nullable|string',
+            'warnings' => 'nullable|string',
+            'status' => 'required|string',
+            'image' => 'required|string',
             'stock' => 'required|integer',
             'category' => 'required|string|in:' . implode(',', config('categories')),
         ];
@@ -52,15 +60,24 @@ class ProductController extends Controller
     //update product
      public function update(Request $request, $id)
     {
-        $rules = [
-            'provider_id' => 'required|exists:service_providers,id',
+        $rules =[
+            'provider_id' => 'nullable|exists:service_providers,id',
+            'farmer_id' => 'nullable|exists:farmers,id',
             'name' => 'required|string',
             'description' => 'required|string',
+            'manufacturer' => 'required|string',
             'price' => 'required|numeric',
-            'image' => 'nullable|string',
+            'quantity_available' => 'required|integer',
+            'expiry_date' => 'nullable|date',
+            'storage_conditions' => 'nullable|string',
+            'usage_instructions' => 'nullable|string',
+            'warnings' => 'nullable|string',
+            'status' => 'required|string',
+            'image' => 'required|string',
             'stock' => 'required|integer',
             'category' => 'required|string|in:' . implode(',', config('categories')),
         ];
+
 
         try {
             // Validate the incoming request data
