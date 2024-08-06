@@ -10,6 +10,7 @@ use App\Http\Controllers\FarmAnimalController;
 use App\Http\Controllers\HealthRecordController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\ParavetRequestController;
 
 /*
 |--------------------------------------------------------------------------
@@ -82,6 +83,9 @@ Route::group(['middleware' => ['auth:api']], function ()
     // Route::post('/order', [OrderController::class, 'store']);
     // Route::get('/order', [OrderController::class, 'index']);
 
+    //paravet request registration routes
+     Route::resource('/paravet-request', ParavetRequestController::class);
+     Route::post('/get-available-paravets', [ParavetRequestController::class, 'availableParavets']);
     
 
 });

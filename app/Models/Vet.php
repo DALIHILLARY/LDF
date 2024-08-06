@@ -161,4 +161,9 @@ class Vet extends Model
     {
         return $this->hasMany(AvailableTime::class);
     }
+
+    public function paravetRequests()
+    {
+        return $this->hasMany(ParavetRequest::class);
+    }
 }
