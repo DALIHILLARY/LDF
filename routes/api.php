@@ -13,6 +13,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\ParavetRequestController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\UserRoleController;
 
 /*
 |--------------------------------------------------------------------------
@@ -88,6 +89,7 @@ Route::group(['middleware' => ['auth:api']], function ()
     //paravet request registration routes
      Route::resource('/paravet-request', ParavetRequestController::class);
      Route::post('/get-available-paravets', [ParavetRequestController::class, 'availableParavets']);
+     Route::get('/paravet-requests-stats/{id}', [ParavetRequestController::class, 'getTotals']);
     
     //paravet ratings
     Route::resource('/rate-paravet', RatingController::class);
@@ -95,6 +97,9 @@ Route::group(['middleware' => ['auth:api']], function ()
 
     //notifications
     Route::resource('/notifications', NotificationController::class);
+
+    //get user roles
+    Route::get('/user-roles', [UserRoleController::class, 'show']);
 
 
 });

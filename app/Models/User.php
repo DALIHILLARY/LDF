@@ -35,6 +35,16 @@ class User extends Authenticatable implements JWTSubject
         return [];
     }
 
+    public function roles()
+    {
+        $pivotTable = config('admin.database.role_users_table');
+
+        $relatedModel = config('admin.database.roles_model');
+
+        return $this->belongsToMany($relatedModel, $pivotTable, 'user_id', 'role_id');
+    }
+
+
   
 
 }

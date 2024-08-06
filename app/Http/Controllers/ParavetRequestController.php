@@ -139,11 +139,11 @@ class ParavetRequestController extends Controller
        public static function getTotals($id)
        {
            $data = [
-               'total_requests' => ParavetRequest::where('patavet_id', $id)->count(),
-               'pending_requests' => ParavetRequest::where('patavet_id', $id)->where('status','pending')->count(),
-               'completed_requests' => ParavetRequest::where('patavet_id', $id)->where('status','completed')->count(),
-               'rejected_requests' => ParavetRequest::where('patavet_id', $id)->where('status','rejected')->count(),
-               'accepted_requests' => ParavetRequest::where('patavet_id', $id)->where('status','accepted')->count(),
+               'total_requests' => ParavetRequest::where('paravet_id', $id)->count(),
+               'pending_requests' => ParavetRequest::where('paravet_id', $id)->where('status','pending')->count(),
+               'completed_requests' => ParavetRequest::where('paravet_id', $id)->where('status','completed')->count(),
+               'rejected_requests' => ParavetRequest::where('paravet_id', $id)->where('status','rejected')->count(),
+               'accepted_requests' => ParavetRequest::where('paravet_id', $id)->where('status','accepted')->count(),
 
               ];
             
