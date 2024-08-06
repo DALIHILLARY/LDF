@@ -12,6 +12,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\ParavetRequestController;
 use App\Http\Controllers\RatingController;
+use App\Http\Controllers\NotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -91,6 +92,9 @@ Route::group(['middleware' => ['auth:api']], function ()
     //paravet ratings
     Route::resource('/rate-paravet', RatingController::class);
     Route::get('/average-ratings', [RatingController::class, 'averageRating']);
+
+    //notifications
+    Route::resource('/notifications', NotificationController::class);
 
 
 });
