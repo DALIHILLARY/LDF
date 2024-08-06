@@ -11,6 +11,7 @@ use App\Http\Controllers\HealthRecordController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\ParavetRequestController;
+use App\Http\Controllers\RatingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -87,6 +88,10 @@ Route::group(['middleware' => ['auth:api']], function ()
      Route::resource('/paravet-request', ParavetRequestController::class);
      Route::post('/get-available-paravets', [ParavetRequestController::class, 'availableParavets']);
     
+    //paravet ratings
+    Route::resource('/rate-paravet', RatingController::class);
+    Route::get('/average-ratings', [RatingController::class, 'averageRating']);
+
 
 });
 
