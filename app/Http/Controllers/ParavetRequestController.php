@@ -108,7 +108,7 @@ class ParavetRequestController extends Controller
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'status' => 'required|string|in:accepted,rejected',
+            'status' => 'required|string|in:accepted,rejected,completed',
             'paravet_id' => 'required|integer|exists:vets,id',
         ]);
 
@@ -134,5 +134,21 @@ class ParavetRequestController extends Controller
             'paravetRequest' => $paravetRequest
         ], 200);
     }
+
+       //function to get the totals of a patavet
+       public static function getTotals($id)
+       {
+           $data = [
+               'total_requests' => ParavetRequest::where('patavet_id', $id)->count(),
+               'pending_requests' => ParavetRequest::where('patavet_id', $id)->where('status','pending')->count(),
+               'completed_requests' => ParavetRequest::where('patavet_id', $id)->where('status','completed')->count(),
+               'rejected_requests' => ParavetRequest::where('patavet_id', $id)->where('status','rejected')->count(),
+               'accepted_requests' => ParavetRequest::where('patavet_id', $id)->where('status','accepted')->count(),
+
+              ];
+            
+   
+           return response()->json($data);
+       }
 
 }
