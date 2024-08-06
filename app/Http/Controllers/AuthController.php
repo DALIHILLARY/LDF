@@ -6,10 +6,11 @@ use App\Models\AdminRoleUser;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Encore\Admin\Auth\Database\Administrator;
-
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
+
 
 
 
@@ -119,6 +120,59 @@ class AuthController extends Controller
                 return response()->json(['error' => 'token_absent', $e->getMessage()],500);
             }
         }
+
+        //function to send a password reset token
+
+        public function sendResetToken(Request $request)
+        {
+            $request->validate(['email' => 'required|email']);
+
+            $user = User::where('email', $request->email)->first();
+
+            if (!$user) {
+                return response()->json(['error' => 'User not found'], 404);
+            }
+
+            // Generate the token
+            $token = Password::createToken($user);
+
+            // Here you can send the token via SMS or other means, for now, we'll return it in the response
+            return response()->json([
+                'message' => 'Password reset token generated',
+                'token' => $token,
+                'email' => $request->email
+            ], 200);
+        }
+
+
+        //function to reset the password
+        public function resetPassword(Request $request)
+        {
+            $validator = Validator::make($request->all(), [
+                'email' => 'required|string|email|max:255|exists:admin_users,email',
+                'password' => 'required|string|min:6|confirmed',
+                'token' => 'required|string',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json($validator->errors(), 400);
+            }
+
+            $status = Password::reset(
+                $request->only('email', 'password', 'password_confirmation', 'token'),
+                function ($user, $password) {
+                    $user->password = Hash::make($password);
+                    $user->save();
+                }
+            );
+
+            if ($status === Password::PASSWORD_RESET) {
+                return response()->json(['message' => 'Password reset successfully']);
+            }
+
+            return response()->json(['error' => 'Failed to reset password'], 500);
+        }
+
         
         
         
