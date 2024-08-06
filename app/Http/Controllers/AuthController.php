@@ -136,7 +136,8 @@ class AuthController extends Controller
             // Generate the token
             $token = Password::createToken($user);
 
-            // Here you can send the token via SMS or other means, for now, we'll return it in the response
+
+            // Here you can send the token via SMS 
             return response()->json([
                 'message' => 'Password reset token generated',
                 'token' => $token,
